@@ -1,0 +1,10 @@
+{
+  "id": "drf_001_inspect",
+  "projectId": "autoguard-canvas",
+  "title": "Inspect Hub: Tactical Forensic Reticle & Acoustic Spectrum Stethoscope",
+  "status": "active",
+  "mode": "branch",
+  "parent": "inspect_replica.html",
+  "createdAt": "2026-09-05T02:02:30Z",
+  "tags": ["inspect", "reticle", "acoustic", "vin-ocr", "multimodal-ai"]
+}

@@ -1,0 +1,1145 @@
+AutoGuard AI
+DOCUMENT 1 — Complete Bug Fix Prompts
+20 Ready-to-Paste Prompts  ·  Copy Each Into Google AI Studio Chat
+
+
+
+HOW TO USE THIS DOCUMENT
+1. Open Google AI Studio (aistudio.google.com) with your AutoGuard project loaded.
+2. Find the prompt number matching the bug you want to fix.
+3. Copy EVERYTHING between the dashed lines — including the code blocks.
+4. Paste it into the AI Studio chat input and press Enter.
+5. AI Studio will generate the corrected file. Review and accept the changes.
+6. Work through prompts in order — some fixes depend on previous ones.
+TIP: Do Prompts 1-5 first (critical fixes) before attempting any feature work.
+
+
+CRITICAL FIXES — Do These First
+
+
+PROMPT 01 — Fix System Instructions (Most Critical)
+Fixes: Empty GDVF system instruction stub. Without this, the AI has no knowledge, personality, or forensic capability.
+
+PROMPT 01  — REPLACE GDVF SYSTEM INSTRUCTION
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In the file src/services/geminiService.ts, replace the existing
+SYSTEM_INSTRUCTION constant (which currently ends with '...') with
+this complete production version:
+
+export const GDVF_SYSTEM_INSTRUCTION = `
+You are the GLOBAL DIRECTOR OF VEHICLE FORENSICS & RECONDITIONING (GDVF).
+You are the world's most advanced automotive forensic intelligence, combining
+the expertise of a master mechanic, crash investigator, structural engineer,
+acoustic diagnostician, and certified vehicle appraiser.
+
+CORE MISSION: Detect mechanical pathology, structural compromise, safety-critical
+failures, prior damage concealment, and reconditioning fraud with forensic precision.
+
+PERSONALITY: Calm, authoritative, precise. Use proper engineering terminology.
+Say 'stress fracture propagating across the B-pillar', not 'the car is cracked'.
+In LIVE mode: maximum 2 sentences per turn. Be directive: 'Move left. Hold still.'
+
+PROTOCOL 1 — PANEL BEATER DETECTION:
+Scan reflective surfaces for orange-peel waviness indicating Bondo filler.
+Flag hue shifts, metallic flake orientation mismatch between adjacent panels.
+Uniform factory gap tolerance is plus or minus 1mm. Uneven gaps = panel replaced.
+Inspect door jambs and rubber seals for paint overspray = spray booth repair.
+Look for stripped fasteners and disturbed seam sealant = prior panel removal.
+
+PROTOCOL 2 — UNDERCARRIAGE FORENSICS:
+Fresh undercoating over localized areas only = concealed rust or weld repair.
+Examine frame rails for kinking, clamp marks (parallel linear depressions), and
+weld quality inconsistencies (repair welds are thicker and irregular).
+Rust grades: NONE / SURFACE (structurally sound) / STRUCTURAL_ROT (immediate hazard).
+Map fluid leaks by color: brown/black=oil, red/pink=transmission, blue/clear=coolant.
+
+PROTOCOL 3 — ACOUSTIC PATHOLOGY (20Hz-20kHz range):
+20-200Hz: Structural resonance, exhaust drone, transmission rumble.
+200-800Hz: Engine knock, rod bearing knock, valve train noise.
+800Hz-2kHz: Brake squeal onset, serpentine belt slip, CV joint click.
+2kHz-8kHz: Wheel bearing whir, alternator whine.
+8kHz-20kHz: High-frequency bearing distress, brake glazing, turbo whistle.
+KNOCK at idle 600-800Hz = rod knock HIGH severity.
+GRIND during braking = metal to metal, pads consumed, replace immediately.
+CLICK on low-speed turns = CV joint wear. WHINE proportional to speed = wheel bearing.
+
+PROTOCOL 4 — GLASS AND ADAS:
+Windshield crack in driver line of sight = REPLACE immediately.
+Any ADAS camera area disturbance near rearview mirror = set adasCalibrationRequired true.
+Headlight hazing above 6 out of 10 = over 30% light loss = legal hazard.
+
+PROTOCOL 5 — SAFETY SYSTEMS:
+Deployed airbag not replaced = automatic TOW TRUCK ONLY decision.
+Inspect steering wheel and dash for white powder residue = sodium azide deployment.
+Brake rotor scoring over 2mm depth or heat-bluing = flag HIGH.
+Tire tread below 2/32 inch = illegal. Sidewall cracks or bulges = CRITICAL.
+
+PROTOCOL 6 — MILEAGE FORENSICS:
+Cross-reference stated mileage against: steering wheel leather wear,
+pedal rubber profile, seat bolster wear, UV fade on dash vs door jambs.
+Set MILEAGE_ROLLBACK_SUSPECTED if wear patterns are inconsistent with stated mileage.
+
+VEHICLE CLASS CALIBRATION:
+ECONOMY: Lower costs, higher mileage normal, less corrosion protection expected.
+LUXURY: OEM parts only, complex ADAS, multiply labor rates by 1.5x to 2x.
+EXOTIC: Carbon fiber delamination check, track use detection, costs 2x to 5x luxury.
+COMMERCIAL: Accelerated wear expected, inspect load area, note DOT compliance.
+
+RISK ASSESSMENT LOGIC:
+finalDecision MUST be TOW TRUCK ONLY if any of these are true:
+- Deployed airbag not replaced OR airbag warning light illuminated
+- Brake fluid empty OR brake pedal goes to floor
+- Frame rail kinked or cracked
+- Tire at or below legal minimum OR sidewall damage
+- Active brake, fuel, or steering fluid leak
+- Wheel bearing failure indicated acoustically
+finalDecision is SAFE TO DRIVE only when none of the above apply AND
+overallHealth is 40 or above.
+
+OUTPUT RULES:
+Return ONLY valid JSON matching the responseSchema. No markdown, no commentary.
+Never truncate. Confidence: 90-100=crystal clear, 70-89=good, 50-69=partial, under 50=insufficient.
+Cost estimates always include three tiers: DIY/budget, independent shop, dealer/specialist.
+`;
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 02 — Fix Model Names (Critical — App Currently Crashes)
+Fixes: gemini-3-pro-preview does not exist, causing 404 errors on every API call.
+
+PROMPT 02  — FIX ALL MODEL NAMES IN geminiService.ts
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In src/services/geminiService.ts, find and replace ALL occurrences of model
+names. This is a CRITICAL fix — the current model names do not exist and
+the app cannot make any API calls.
+
+FIND and REPLACE these exact strings:
+
+WRONG (causes 404 error):
+  model: "gemini-3-pro-preview"
+  model: 'gemini-3-pro-preview'
+
+CORRECT replacement for analyzeVehicle() function:
+  model: "gemini-2.5-pro-preview-05-06"
+
+WRONG (causes 404 error):
+  model: 'gemini-2.5-flash-native-audio-preview-12-2025'
+
+CORRECT replacement for all live audio connections:
+  model: 'gemini-2.0-flash-live-001'
+
+Also add these two constants at the top of the file after the imports,
+to make future model updates easy:
+
+const ANALYSIS_MODEL = 'gemini-2.5-pro-preview-05-06';
+const LIVE_MODEL = 'gemini-2.0-flash-live-001';
+
+Then replace all hardcoded model strings with these constants.
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 03 — Add Complete Response Schema (Critical — No Structured Output)
+Fixes: responseSchema is an empty comment. Without it, Gemini returns freeform text that cannot be parsed.
+
+PROMPT 03  — ADD COMPLETE FORENSIC RESPONSE SCHEMA
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In src/services/geminiService.ts, the responseSchema field in the
+generateContent config is currently just an empty comment.
+Replace it with this complete schema:
+
+import { Type } from '@google/genai';
+
+export const FORENSIC_RESPONSE_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    damages: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: {
+      id: { type: Type.STRING },
+      type: { type: Type.STRING, enum: ['BODY','MECHANICAL','STRUCTURAL','INTERIOR','GLASS','WHEELS','SAFETY'] },
+      component: { type: Type.STRING },
+      description: { type: Type.STRING },
+      status: { type: Type.STRING, enum: ['GREEN','YELLOW','RED'] },
+      severityScore: { type: Type.NUMBER },
+      estimatedCost: { type: Type.OBJECT, properties: {
+        low: { type: Type.STRING },
+        medium: { type: Type.STRING },
+        high: { type: Type.STRING },
+      }, required: ['low','medium','high'] },
+      actionRequired: { type: Type.STRING },
+      acousticProfile: { type: Type.STRING, nullable: true },
+    }, required: ['id','type','component','description','status','severityScore','estimatedCost','actionRequired'] }},
+    overallHealth: { type: Type.NUMBER },
+    confidenceScore: { type: Type.NUMBER },
+    summary: { type: Type.STRING },
+    priorRepairDetected: { type: Type.BOOLEAN },
+    adasCalibrationRequired: { type: Type.BOOLEAN },
+    forensicVerdict: { type: Type.STRING },
+    finalRecommendation: { type: Type.STRING, enum: ['RETAIL READY','WHOLESALE TRADE','SCRAP / SALVAGE'] },
+    riskAssessment: { type: Type.OBJECT, properties: {
+      brakingSystem: { type: Type.BOOLEAN },
+      steeringSuspension: { type: Type.BOOLEAN },
+      fireRisk: { type: Type.BOOLEAN },
+      structuralIntegrity: { type: Type.BOOLEAN },
+      finalDecision: { type: Type.STRING, enum: ['SAFE TO DRIVE','TOW TRUCK ONLY'] },
+      rationale: { type: Type.STRING },
+    }, required: ['brakingSystem','steeringSuspension','fireRisk','structuralIntegrity','finalDecision','rationale'] },
+    underCarriageAudit: { type: Type.OBJECT, nullable: true, properties: {
+      undercoatingDetected: { type: Type.BOOLEAN },
+      undercoatingRationale: { type: Type.STRING },
+      railStraightness: { type: Type.STRING, enum: ['PERFECT','KINKED','CLAMP_MARKS_DETECTED'] },
+      railRationale: { type: Type.STRING },
+      rustGrade: { type: Type.STRING, enum: ['NONE','SURFACE','STRUCTURAL_ROT'] },
+      rustRationale: { type: Type.STRING },
+      leakTrace: { type: Type.STRING },
+    }},
+    acousticAudit: { type: Type.OBJECT, nullable: true, properties: {
+      signatures: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: {
+        frequencyRange: { type: Type.STRING },
+        detectedStatus: { type: Type.STRING, enum: ['NORMAL_OPERATING','ANOMALY_DETECTED'] },
+        description: { type: Type.STRING },
+        crossReferenceNote: { type: Type.STRING },
+      }}},
+      overallMechanicalNote: { type: Type.STRING },
+    }},
+  },
+  required: ['damages','overallHealth','confidenceScore','summary','priorRepairDetected',
+    'adasCalibrationRequired','forensicVerdict','finalRecommendation','riskAssessment']
+};
+
+Then update the generateContent call config to use it:
+  config: {
+    systemInstruction: GDVF_SYSTEM_INSTRUCTION,
+    responseMimeType: 'application/json',
+    responseSchema: FORENSIC_RESPONSE_SCHEMA,
+  }
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 04 — Fix JSON Parsing and Add Retry Logic
+Fixes: JSON.parse crashes if Gemini wraps output in markdown. No retry on 429/503 errors.
+
+PROMPT 04  — ADD SAFE JSON PARSER AND RETRY LOGIC
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In src/services/geminiService.ts, add these utility functions BEFORE the
+GeminiService class definition:
+
+// Safe base64 extractor — fixes split(',')[1] bug
+const toBase64 = (data: string): string =>
+  data.replace(/^data:[^;]+;base64,/, '');
+
+// Safe JSON parser — handles Gemini markdown code fence wrapping
+const safeParseJSON = (raw: string): any => {
+  try {
+    const cleaned = raw
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim();
+    return JSON.parse(cleaned);
+  } catch (err) {
+    console.error('[AutoGuard] JSON parse failed. Raw response:', raw.substring(0, 300));
+    return null;
+  }
+};
+
+// Retry with exponential backoff for 429 and 503 errors
+const withRetry = async <T>(fn: () => Promise<T>, maxAttempts = 3): Promise<T> => {
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      const retryable = err?.status === 429 || err?.status === 503;
+      if (!retryable || i === maxAttempts - 1) throw err;
+      const delay = Math.pow(2, i) * 1200;
+      console.warn('[AutoGuard] Retrying in', delay, 'ms... attempt', i+1);
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+  throw new Error('Max retry attempts exceeded');
+};
+
+Then in the analyzeVehicle() method, wrap the API call in withRetry:
+  return withRetry(async () => {
+    const response = await ai.models.generateContent({ ... });
+    const parsed = safeParseJSON(response.text ?? '');
+    if (!parsed) return null;
+    return { ...parsed, id: crypto.randomUUID(), timestamp: Date.now(), vehicle } as InspectionReport;
+  });
+
+Also update asset parts to use toBase64:
+  const assetParts = assets.map(asset => ({
+    inlineData: { data: toBase64(asset.data), mimeType: asset.mimeType }
+  }));
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 05 — Fix Environment Variables and API Key Guard
+Fixes: API_KEY vs GEMINI_API_KEY inconsistency. No guard for missing keys.
+
+PROMPT 05  — STANDARDIZE ENV VARS AND ADD API KEY GUARD
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In src/services/geminiService.ts, at the very top of the file after imports,
+replace ALL API key initialization with this standardized pattern:
+
+// SINGLE SOURCE OF TRUTH for API key — never use process.env.API_KEY
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+if (!GEMINI_API_KEY) {
+  throw new Error(
+    '[AutoGuard] FATAL: GEMINI_API_KEY environment variable is not set.\n' +
+    'Create a .env file in your project root with:\n' +
+    'GEMINI_API_KEY=your_api_key_here'
+  );
+}
+
+const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+Then search the entire file for any remaining 'process.env.API_KEY' or
+'new GoogleGenAI({ apiKey: process.env.API_KEY })' and replace them
+all with the constant above.
+
+Also create a .env.example file in the project root with this content
+(this is safe to commit — it has no real values):
+
+# AutoGuard AI Environment Variables
+# Copy this file to .env and fill in your real values
+# NEVER commit .env to git
+GEMINI_API_KEY=your_gemini_api_key_from_aistudio
+FIREBASE_API_KEY=your_firebase_api_key
+FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+
+And update .gitignore to include:
+.env
+.env.local
+.env.production
+serviceAccount*.json
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 06 — Fix TypeScript Types (ForensicAsset + timestamp)
+Fixes: ForensicAsset type missing, timestamp string/number mismatch across files.
+
+PROMPT 06  — FIX TYPES.TS — ADD MISSING TYPES AND STANDARDIZE
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In src/types.ts, add these missing types and fix the timestamp inconsistency.
+
+ADD this interface (it was used in geminiService.ts but never defined):
+export interface ForensicAsset {
+  data: string;       // base64 data URL or raw base64
+  mimeType: string;   // 'image/jpeg' | 'image/png' | 'audio/wav' | 'video/mp4'
+  label: string;      // 'front_exterior' | 'undercarriage' | 'engine_bay' | 'interior'
+}
+
+FIND and CHANGE this in the InspectionReport interface:
+  WRONG:  timestamp: string;
+  CORRECT: timestamp: number;   // Always Unix milliseconds
+
+ADD this callback interface for the Live API:
+export interface LiveCallbacks {
+  onopen?: () => void;
+  onmessage: (msg: any) => void;
+  onerror?: (err: any) => void;
+  onclose?: (evt: CloseEvent) => void;
+}
+
+ADD this for the social media feature (new):
+export interface SocialPost {
+  id: string;
+  platform: 'twitter' | 'instagram' | 'facebook' | 'linkedin';
+  content: string;
+  imageUrl?: string;
+  scheduledAt: number;
+  status: 'pending' | 'published' | 'failed';
+  reportId?: string;
+}
+
+ADD this for self-maintenance:
+export interface SystemHealth {
+  timestamp: number;
+  apiLatency: number;
+  errorRate: number;
+  storageUsed: number;
+  activeUsers: number;
+  status: 'healthy' | 'degraded' | 'critical';
+}
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 07 — Fix Live API Error Handling
+Fixes: No error handling in Live API callbacks — network failures silently kill the session.
+
+PROMPT 07  — ADD ROBUST LIVE API ERROR HANDLING
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In src/services/geminiService.ts, replace the connectLive() and
+connectGuardianLive() methods with these robust versions:
+
+connectLive(callbacks: LiveCallbacks): Promise<any> {
+  return ai.live.connect({
+    model: LIVE_MODEL,
+    config: {
+      responseModalities: [Modality.AUDIO],
+      systemInstruction: GDVF_SYSTEM_INSTRUCTION + '\n\nLIVE FORENSIC MODE.',
+    },
+    callbacks: {
+      onopen: () => {
+        console.log('[AutoGuard Live] Connection established');
+        callbacks.onopen?.();
+      },
+      onmessage: (msg: any) => {
+        try { callbacks.onmessage(msg); }
+        catch (err) { console.error('[AutoGuard Live] Message handler error:', err); }
+      },
+      onerror: (err: any) => {
+        console.error('[AutoGuard Live] Connection error:', err);
+        callbacks.onerror?.(err);
+      },
+      onclose: (evt: CloseEvent) => {
+        console.log('[AutoGuard Live] Closed. Code:', evt.code, 'Reason:', evt.reason);
+        if (evt.code !== 1000) {
+          console.warn('[AutoGuard Live] Abnormal closure — consider reconnecting');
+        }
+        callbacks.onclose?.(evt);
+      },
+    },
+  });
+}
+
+Also add this reconnection helper in CameraView.tsx and GuardianView.tsx:
+const MAX_RECONNECT_ATTEMPTS = 3;
+let reconnectCount = 0;
+
+const handleLiveClose = async (evt: CloseEvent) => {
+  if (evt.code !== 1000 && reconnectCount < MAX_RECONNECT_ATTEMPTS) {
+    reconnectCount++;
+    const delay = reconnectCount * 2000;
+    setGuidanceText('Connection lost. Reconnecting... attempt ' + reconnectCount);
+    await new Promise(r => setTimeout(r, delay));
+    await toggleLive(); // attempt reconnect
+  } else {
+    setIsLiveEnabled(false);
+    setGuidanceText('Connection ended. Press button to reconnect.');
+  }
+};
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 08 — Implement CameraView Pipeline (Currently Stub)
+Fixes: handleCapture() and toggleLive() are empty stub functions. The entire camera feature does nothing.
+
+PROMPT 08  — IMPLEMENT FULL CAMERA CAPTURE PIPELINE
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+Replace the stub handleCapture() and toggleLive() in CameraView.tsx with
+this complete working implementation:
+
+const videoRef = useRef<HTMLVideoElement>(null);
+const streamRef = useRef<MediaStream | null>(null);
+const liveSessionRef = useRef<any>(null);
+const [isCapturing, setIsCapturing] = useState(false);
+const [capturedAssets, setCapturedAssets] = useState<ForensicAsset[]>([]);
+
+const toggleLive = async () => {
+  if (isLiveEnabled) {
+    liveSessionRef.current?.close();
+    liveSessionRef.current = null;
+    streamRef.current?.getTracks().forEach(t => t.stop());
+    setIsLiveEnabled(false);
+    setGuidanceText('');
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(
+      { video: { width: 1920, height: 1080, facingMode: 'environment' }, audio: true }
+    );
+    streamRef.current = stream;
+    if (videoRef.current) videoRef.current.srcObject = stream;
+    setIsLiveEnabled(true);
+    const session = await geminiService.connectLive({
+      onopen: () => setGuidanceText('Live forensic session active. Ready for inspection.'),
+      onmessage: (msg) => {
+        const text = msg.serverContent?.modelTurn?.parts?.find((p:any) => p.text)?.text;
+        if (text) setGuidanceText(text);
+      },
+      onerror: (err) => setGuidanceText('Connection error: ' + err.message),
+      onclose: () => setIsLiveEnabled(false),
+    });
+    liveSessionRef.current = session;
+  } catch (err: any) {
+    alert('Camera access denied: ' + err.message);
+    setIsLiveEnabled(false);
+  }
+};
+
+const captureFrame = (): ForensicAsset | null => {
+  if (!videoRef.current) return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = videoRef.current.videoWidth;
+  canvas.height = videoRef.current.videoHeight;
+  canvas.getContext('2d')?.drawImage(videoRef.current, 0, 0);
+  return { data: canvas.toDataURL('image/jpeg', 0.92), mimeType: 'image/jpeg', label: currentPhase };
+};
+
+const handleCapture = async () => {
+  setIsCapturing(true);
+  const frame = captureFrame();
+  if (!frame) { setIsCapturing(false); return; }
+  const allAssets = [...capturedAssets, frame];
+  setCapturedAssets(allAssets);
+  try {
+    const report = await geminiService.analyzeVehicle(allAssets, vehicle);
+    if (report) onReportGenerated(report);
+  } catch (err: any) {
+    alert('Analysis failed: ' + err.message);
+  } finally {
+    setIsCapturing(false);
+  }
+};
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 09 — Implement Guardian GPS Mode (Currently Stub)
+Fixes: toggleGuardian() is an empty stub with no GPS, no live connection, nothing works.
+
+PROMPT 09  — IMPLEMENT GUARDIAN GPS AND LIVE NAVIGATION
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+Replace the stub toggleGuardian() in GuardianView.tsx with this full implementation:
+
+const [position, setPosition] = useState<GeolocationPosition | null>(null);
+const watchIdRef = useRef<number | null>(null);
+const guardianSessionRef = useRef<any>(null);
+const [transcript, setTranscript] = useState<string[]>([]);
+const audioContextRef = useRef<AudioContext | null>(null);
+
+const startLocationTracking = () => {
+  if (!navigator.geolocation) { alert('GPS not available'); return; }
+  watchIdRef.current = navigator.geolocation.watchPosition(
+    (pos) => {
+      setPosition(pos);
+      if (guardianSessionRef.current) {
+        const locParts = ['LOCATION UPDATE: Lat', pos.coords.latitude.toFixed(5),
+          'Lon', pos.coords.longitude.toFixed(5),
+          'Speed', ((pos.coords.speed||0)*3.6).toFixed(1), 'km/h'];
+        const locationUpdate = locParts.join(' ');
+        guardianSessionRef.current.sendMessage({ text: locationUpdate });
+      }
+    },
+    (err) => console.error('GPS error:', err),
+    { enableHighAccuracy: true, maximumAge: 1000, timeout: 5000 }
+  );
+};
+
+const toggleGuardian = async () => {
+  if (isActive) {
+    guardianSessionRef.current?.close();
+    if (watchIdRef.current) navigator.geolocation.clearWatch(watchIdRef.current);
+    audioContextRef.current?.close();
+    setIsActive(false);
+    setTranscript([]);
+    return;
+  }
+  if (!mission.destination) { alert('Please enter a destination first.'); return; }
+  setIsActive(true);
+  startLocationTracking();
+  const session = await geminiService.connectGuardianLive(mission, {
+    onopen: () => {
+      setTranscript(prev => [...prev, 'GUARDIAN: Active. Monitoring your journey.']);
+      session.sendMessage({ text: 'Guardian activated. Destination: ' + mission.destination +
+        '. Vehicle: ' + mission.vehicleProfile + '. Threat level: ' + mission.threatLevel });
+    },
+    onmessage: (msg: any) => {
+      const text = msg.serverContent?.modelTurn?.parts?.find((p:any)=>p.text)?.text;
+      if (text) setTranscript(prev => [...prev.slice(-20), 'GUARDIAN: ' + text]);
+      // Play audio response if present
+      const audio = msg.serverContent?.modelTurn?.parts?.find((p:any)=>p.inlineData?.mimeType?.startsWith('audio'));
+      if (audio) playAudio(audio.inlineData.data);
+    },
+    onerror: (err: any) => setTranscript(prev => [...prev, 'ERROR: ' + err.message]),
+    onclose: () => setIsActive(false),
+  });
+  guardianSessionRef.current = session;
+};
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 10 — Fix package.json Missing Dependencies
+Fixes: @google/genai missing from dependencies, Tailwind v3/v4 conflict.
+
+PROMPT 10  — FIX PACKAGE.JSON AND TAILWIND CONFLICT
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+1. Update package.json to add the missing @google/genai dependency
+   and remove the firebase placeholder (add real version):
+
+{
+  "name": "autoguard-ai",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext ts,tsx"
+  },
+  "dependencies": {
+    "@google/genai": "^0.7.0",
+    "firebase": "^10.12.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^6.22.0",
+    "recharts": "^2.12.0",
+    "lucide-react": "^0.475.0",
+    "motion": "^12.4.7"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.1",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}
+
+2. REMOVE the CDN script tag from index.html:
+   DELETE: <script src="https://cdn.tailwindcss.com"></script>
+
+3. Update index.css to use Tailwind v3 syntax:
+   REPLACE: @import "tailwindcss";
+   WITH:
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+
+4. Create tailwind.config.js in project root:
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: { extend: {} },
+  plugins: [],
+}
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 11 — Add React Error Boundary
+Fixes: Any unhandled error causes a blank white screen in production.
+
+PROMPT 11  — ADD ERROR BOUNDARY TO PREVENT WHITE SCREEN CRASHES
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+Create a new file src/components/ErrorBoundary.tsx with this content:
+
+import React, { Component, ReactNode } from 'react';
+
+interface Props { children: ReactNode; }
+interface State { hasError: boolean; error: Error | null; }
+
+export class ErrorBoundary extends Component<Props, State> {
+  state: State = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, info: any) {
+    console.error('[AutoGuard] Uncaught error:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-8">
+          <div className="bg-red-950/50 border border-red-500/30 rounded-3xl p-10 max-w-lg text-center">
+            <div className="text-5xl mb-4">⚠️</div>
+            <h1 className="text-white font-black text-2xl mb-3">System Error</h1>
+            <p className="text-red-300 mb-2 font-mono text-sm">{this.state.error?.message}</p>
+            <p className="text-slate-400 text-sm mb-8">
+              AutoGuard has encountered an unexpected error. Your data is safe.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-red-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-red-500"
+            >
+              Reload AutoGuard
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+Then in src/main.tsx, wrap the App component:
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+root.render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </React.StrictMode>
+);
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 12 — Add Guardian System Instruction
+Fixes: Guardian AI has no personality or navigation intelligence.
+
+PROMPT 12  — ADD COMPLETE GUARDIAN NAVIGATION AI SYSTEM INSTRUCTION
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In src/services/geminiService.ts, add this constant after GDVF_SYSTEM_INSTRUCTION:
+
+export const GUARDIAN_SYSTEM_INSTRUCTION = `
+You are GLOBAL GUARDIAN, an elite tactical AI co-pilot for AutoGuard AI.
+You combine the expertise of a professional race co-pilot, tactical security
+specialist, meteorologist, and emergency response coordinator.
+You speak directly into the driver's ears in real time.
+
+CRITICAL VOICE RULES (vehicle in motion):
+Turn instructions: maximum 12 words.
+Hazard warnings: maximum 20 words.
+Speed alerts: maximum 8 words.
+Full sentences only when vehicle is parked or speed is below 5mph.
+
+PROACTIVE INTELLIGENCE: You see ahead and warn before problems arrive.
+Speed cameras: warn 400 meters before. School zones: warn 250 meters before.
+Lane requirements: announce 600 meters before complex junctions.
+Weather changes: warn 5 minutes of drive time in advance.
+Always address the driver as 'you'. Never say 'the driver'.
+
+NAVIGATION PRIORITY (highest to lowest):
+1. Active road closures and accidents - immediate reroute.
+2. Emergency vehicle corridor - yield and hold.
+3. Driver fatigue over 2 hours continuous driving.
+4. Weather hazards: ice, flood, dense fog, severe crosswind.
+5. Vehicle condition warnings from Forensic module.
+6. School and hospital zones - reduce speed.
+7. Traffic congestion with time cost analysis.
+8. Fuel or charge level versus route range.
+9. User preference then fastest path.
+
+VOICE TEMPLATES:
+Turn: 'In [distance], turn [direction] on [road].'
+Speed: '[limit] zone ahead.'
+Hazard: 'Caution — [hazard] ahead. Reduce speed.'
+Reroute: 'Faster route found. Recalculating.'
+Arrival: 'Destination on your [left or right]. Arrived.'
+
+DRIVING BEHAVIOR COACHING:
+Hard braking - note after stop only, never during event:
+  'Increasing following distance gives you more reaction time.'
+Speeding over 5mph in urban zone: '[limit] zone. Reduce speed.'
+Tailgating: 'Increase following distance for safety.'
+Phone use detected: 'Guardian enabled Do Not Disturb. Stay focused.'
+Clean 30 minute segment: 'Excellent driving. Safety score is strong.'
+
+EMERGENCY PROTOCOL:
+On crash detection:
+Step 1: 'I detected an impact. Emergency services are being contacted.'
+Step 2: 'Stay still. Help is on the way. Hazards are on.'
+Step 3: 'Are you injured? Say yes or no.'
+Step 4 if no response in 10 seconds: 'Calling emergency services now.'
+
+Drowsiness at 2 hours: 'You have been driving 2 hours. Rest area ahead.'
+Drowsiness at 3 hours: 'Fatigue increases risk significantly. Stop soon.'
+Lane drift detected: 'Driving pattern changed. Pull over safely.'
+
+HARD LIMITS - NEVER VIOLATE:
+Never suggest illegal maneuvers.
+Never disable safety alerts while in motion.
+Never speak more than 20 words above 20mph.
+Never joke during active hazard situations.
+Always defer to emergency services over your own guidance.
+`;
+──────────────────────────────────────────────────────────────────────
+
+
+
+REMAINING BUG FIX PROMPTS
+
+
+PROMPT 13 — Implement History Grid in App.tsx
+
+PROMPT 13  — IMPLEMENT INSPECTION HISTORY GRID
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In src/App.tsx, find the commented-out section '// ... History Grid ...'
+and replace it with this working component:
+
+Replace the return statement in the default inspect view with:
+
+<div className="max-w-4xl mx-auto space-y-6">
+  <CameraView onReportGenerated={handleReportGenerated} />
+
+  {history.length > 0 && (
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-black text-slate-900 uppercase tracking-widest text-xs">
+          Recent Inspections
+        </h2>
+        <button onClick={() => setActiveView('insights')}
+          className="text-xs font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest">
+          Fleet Insights →
+        </button>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {history.slice(0, 6).map((report) => (
+          <button key={report.id}
+            onClick={() => setCurrentReport(report)}
+            className={`p-4 rounded-2xl border-2 text-left hover:scale-105 transition-all shadow-md
+              ${report.overallHealth >= 80 ? 'border-green-200 bg-green-50' :
+                report.overallHealth >= 60 ? 'border-amber-200 bg-amber-50' :
+                'border-red-200 bg-red-50'}`}
+          >
+            <div className="text-xs font-black text-slate-500 uppercase mb-1">
+              {new Date(report.timestamp).toLocaleDateString()}
+            </div>
+            <div className="font-black text-slate-900 text-sm truncate">{report.vehicle.makeModel}</div>
+            <div className="text-xs text-slate-500 truncate">{report.vehicle.vin || 'No VIN'}</div>
+            <div className={`text-lg font-black mt-2
+              ${report.overallHealth >= 80 ? 'text-green-600' :
+                report.overallHealth >= 60 ? 'text-amber-600' : 'text-red-600'}`}>
+              {report.overallHealth}%
+            </div>
+            <div className="text-[10px] text-slate-500 font-bold">{report.riskAssessment.finalDecision}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 14 — Fix SDK Import Pattern
+
+PROMPT 14  — STANDARDIZE SDK IMPORT PATTERN
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+Some files use the old ai.models.get() pattern. Standardize all API calls.
+Search all files for this old pattern:
+  const model = ai.models.get('gemini-1.5-pro');
+  const result = await model.generateContent([...]);
+
+Replace with the correct current pattern:
+  const response = await ai.models.generateContent({
+    model: ANALYSIS_MODEL,
+    contents: { parts: [...] },
+    config: {
+      systemInstruction: GDVF_SYSTEM_INSTRUCTION,
+      responseMimeType: 'application/json',
+      responseSchema: FORENSIC_RESPONSE_SCHEMA,
+    }
+  });
+  const result = safeParseJSON(response.text ?? '');
+
+Also check that all files import from '@google/genai' not 'google-generativeai'
+The correct import is:
+  import { GoogleGenAI, Type, Modality } from '@google/genai';
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 15 — Add Firebase Integration Layer
+
+PROMPT 15  — CREATE FIREBASE SERVICE LAYER
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+Create src/services/firebaseService.ts with this content:
+
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { getAuth, signInAnonymously } from 'firebase/auth';
+import { InspectionReport } from '../types';
+
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
+
+export const firebaseService = {
+  async ensureAuth() {
+    if (!auth.currentUser) await signInAnonymously(auth);
+    return auth.currentUser!.uid;
+  },
+
+  async saveReport(report: InspectionReport, imageDataUrl?: string): Promise<string> {
+    const uid = await this.ensureAuth();
+    let imageUrl = report.imageUrl;
+    if (imageDataUrl) {
+      const storageRef = ref(storage, `reports/${uid}/${report.id}.jpg`);
+      await uploadString(storageRef, imageDataUrl, 'data_url');
+      imageUrl = await getDownloadURL(storageRef);
+    }
+    const docRef = await addDoc(collection(db, 'users', uid, 'reports'), {
+      ...report, imageUrl, userId: uid, savedAt: Date.now()
+    });
+    return docRef.id;
+  },
+
+  async getReports(limitCount = 50): Promise<InspectionReport[]> {
+    const uid = await this.ensureAuth();
+    const q = query(collection(db, 'users', uid, 'reports'),
+      orderBy('timestamp', 'desc'), limit(limitCount));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => d.data() as InspectionReport);
+  },
+};
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 16 — Fix Acoustic Frequency Range
+
+PROMPT 16  — FIX ACOUSTIC FREQUENCY RANGE (SCIENTIFIC CORRECTION)
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In src/services/geminiService.ts, in the GDVF system instruction,
+find and correct the acoustic frequency reference.
+
+WRONG (current - misses critical bearing wear frequencies):
+  '20Hz-15kHz' or '20Hz to 15kHz'
+
+CORRECT (full automotive diagnostic range):
+  '20Hz-20kHz'
+
+Also update the LIVE_ADDENDUM acoustic capture phase description:
+WRONG: 'Acoustic capture (20Hz-15kHz range)'
+CORRECT: 'Acoustic capture (full 20Hz-20kHz diagnostic range)'
+
+This matters because high-frequency bearing wear, brake glazing,
+and turbocharger issues produce signatures between 15kHz and 20kHz.
+Without this range, those faults are invisible to the AI.
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 17 — Add Duplicate File Cleanup Instructions
+
+PROMPT 17  — CLEAN UP DUPLICATE FILES AND ESTABLISH SINGLE SOURCE OF TRUTH
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+Multiple identical files exist due to AI Studio versioning.
+Perform these file operations to establish a clean codebase:
+
+KEEP (canonical versions - most complete implementations):
+  src/App.tsx               (use the version with all 4 views)
+  src/types.ts              (use the version with all enums and interfaces)
+  src/services/geminiService.ts  (the version with full GeminiService class)
+  src/components/CameraView.tsx  (the version with HUD elements)
+  src/components/GuardianView.tsx (the version with mission parameters)
+
+DELETE these redundant files:
+  Any file containing only a 'Clean Start' placeholder App component
+  Any duplicate HTML files (keep only one index.html)
+  Any duplicate CSS files (keep only one index.css)
+
+VERIFY the final file structure should be:
+  /src
+    /components
+      CameraView.tsx
+      GuardianView.tsx
+      ReportView.tsx
+      FleetInsights.tsx
+      VehicleTimeline.tsx
+      Layout.tsx
+      ErrorBoundary.tsx   (new, from Prompt 11)
+      IntelligenceHub.tsx
+    /services
+      geminiService.ts
+      firebaseService.ts  (new, from Prompt 15)
+    App.tsx
+    main.tsx
+    types.ts
+  index.html
+  package.json
+  .env
+  .gitignore
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 18 — Add Loading States and User Feedback
+
+PROMPT 18  — ADD PROFESSIONAL LOADING STATES TO ALL ASYNC OPERATIONS
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In CameraView.tsx and App.tsx, replace any loading state with this system:
+
+// Add to CameraView.tsx:
+const [analysisStep, setAnalysisStep] = useState<string>('');
+const [analysisProgress, setAnalysisProgress] = useState(0);
+
+const handleCapture = async () => {
+  setIsCapturing(true);
+  setAnalysisStep('Capturing frame...');
+  setAnalysisProgress(10);
+
+  const frame = captureFrame();
+  setAnalysisStep('Preparing forensic analysis...');
+  setAnalysisProgress(25);
+
+  await new Promise(r => setTimeout(r, 300)); // visual feedback pause
+  setAnalysisStep('Running GDVF forensic protocols...');
+  setAnalysisProgress(50);
+
+  try {
+    const report = await geminiService.analyzeVehicle([frame!], vehicle);
+    setAnalysisProgress(90);
+    setAnalysisStep('Generating report...');
+    await new Promise(r => setTimeout(r, 400));
+    setAnalysisProgress(100);
+    if (report) onReportGenerated(report);
+  } finally {
+    setIsCapturing(false);
+    setAnalysisStep('');
+    setAnalysisProgress(0);
+  }
+};
+
+Add this UI overlay to the camera view when isCapturing is true:
+<div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center z-20 rounded-[3rem]">
+  <div className="text-white font-black text-lg mb-4">{analysisStep}</div>
+  <div className="w-64 h-2 bg-slate-700 rounded-full">
+    <div className="h-full bg-blue-500 rounded-full transition-all duration-500"
+      style={{ width: analysisProgress + '%' }} />
+  </div>
+  <div className="text-slate-400 text-sm mt-3">{analysisProgress}% complete</div>
+</div>
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 19 — Add NHTSA Recall Integration
+
+PROMPT 19  — ADD LIVE NHTSA RECALL LOOKUP BY VIN
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+Create src/services/recallService.ts:
+
+export const recallService = {
+  async getRecallsByVin(vin: string): Promise<NHTSARecall[]> {
+    if (vin.length !== 17) return [];
+    try {
+      const url = `https://api.nhtsa.dot.gov/recalls/recallsByVehicle?vin=${vin}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      return (data.results || []).map((r: any) => ({
+        campaignNumber: r.NHTSACampaignNumber,
+        manufacturer: r.Manufacturer,
+        subject: r.Subject,
+        component: r.Component,
+        consequence: r.Consequence,
+        remedy: r.Remedy,
+        reportDate: r.ReportReceivedDate,
+        unitsAffected: r.PotentialNumberOfUnitsAffected,
+      }));
+    } catch (err) {
+      console.error('NHTSA recall lookup failed:', err);
+      return [];
+    }
+  },
+
+  async getRecallsByMakeModel(make: string, model: string, year: string): Promise<NHTSARecall[]> {
+    try {
+      const url = `https://api.nhtsa.dot.gov/recalls/recallsByVehicle?make=${make}&model=${model}&modelYear=${year}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      return data.results || [];
+    } catch { return []; }
+  }
+};
+
+export interface NHTSARecall {
+  campaignNumber: string;
+  manufacturer: string;
+  subject: string;
+  component: string;
+  consequence: string;
+  remedy: string;
+  reportDate: string;
+  unitsAffected: number;
+}
+
+Then in CameraView.tsx, after a report is generated, call this:
+const recalls = await recallService.getRecallsByVin(vehicle.vin);
+if (recalls.length > 0) {
+  // Attach recalls to report and show RECALL ALERT badge on ReportView
+}
+──────────────────────────────────────────────────────────────────────
+
+
+PROMPT 20 — Add Report Export to PDF
+
+PROMPT 20  — ADD PDF EXPORT FOR INSPECTION REPORTS
+▼  COPY EVERYTHING BELOW THIS LINE  ▼
+──────────────────────────────────────────────────────────────────────
+In ReportView.tsx, add a PDF export button using the browser print API:
+
+const exportToPDF = () => {
+  const printContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>AutoGuard Forensic Report - ${report.vehicle.makeModel}</title>
+      <style>
+        body { font-family: Arial, sans-serif; color: #333; margin: 40px; }
+        h1 { color: #0D1B2A; }
+        .header { background: #0D1B2A; color: white; padding: 20px; border-radius: 8px; }
+        .score { font-size: 48px; font-weight: 900; }
+        .damage { border: 1px solid #ddd; padding: 12px; margin: 8px 0; border-radius: 6px; }
+        .RED { border-left: 4px solid #B71C1C; }
+        .YELLOW { border-left: 4px solid #E65100; }
+        .GREEN { border-left: 4px solid #1B5E20; }
+        .verdict { background: ${report.riskAssessment.finalDecision === 'SAFE TO DRIVE' ? '#E8F5E9' : '#FFEBEE'}; padding: 16px; border-radius: 8px; margin: 16px 0; }
+        @media print { body { margin: 20px; } }
+      </style>
+    </head>
+    <body>
+      <div class='header'>
+        <h1>AutoGuard AI — Forensic Inspection Report</h1>
+        <p>${report.vehicle.year} ${report.vehicle.makeModel} | VIN: ${report.vehicle.vin}</p>
+        <p>Generated: ${new Date(report.timestamp).toLocaleString()}</p>
+      </div>
+      <div class='verdict'>
+        <strong>${report.riskAssessment.finalDecision}</strong>
+        <p>${report.riskAssessment.rationale}</p>
+      </div>
+      <div class='score'>Health Score: ${report.overallHealth}/100</div>
+      <h2>Findings</h2>
+      ${report.damages.map(d => `
+        <div class='damage ${d.status}'>
+          <strong>${d.component}</strong> — ${d.type}<br/>
+          ${d.description}<br/>
+          Cost: $${d.estimatedCost.low} - $${d.estimatedCost.high}
+        </div>
+      `).join('')}
+    </body></html>
+  `;
+  const win = window.open('', '_blank')!;
+  win.document.write(printContent);
+  win.document.close();
+  win.print();
+};
+
+Add this button to ReportView.tsx:
+<button onClick={exportToPDF}
+  className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase hover:bg-blue-700">
+  Export PDF Report
+</button>
+──────────────────────────────────────────────────────────────────────
+

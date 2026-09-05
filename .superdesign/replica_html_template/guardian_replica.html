@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoGuard AI - Guardian GPS Replica</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center font-black text-white text-base shadow-lg shadow-cyan-900/30">AG</div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-lg font-black tracking-tight text-white">AutoGuard AI</h1>
+            <span class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/80">GDVF v2.5</span>
+          </div>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">Vehicle Forensics & Tactical GPS</p>
+        </div>
+      </div>
+      <nav class="flex gap-1 bg-slate-900/90 border border-slate-800 rounded-2xl p-1">
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">🎥 Inspect</span>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md">🛡️ Guardian GPS</span>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">📊 Fleet Analytics</span>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">🔬 Pathology Matrix</span>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">📡 Intel Hub</span>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">🧪 Test Lab</span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-5xl w-full mx-auto p-4 md:p-6 space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Telemetry Card -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-cyan-400">Speed & Dynamics</h3>
+        <div class="flex items-baseline gap-2">
+          <span class="text-5xl font-black font-mono text-white">74</span>
+          <span class="text-xs font-mono text-slate-400 uppercase">KM/H</span>
+        </div>
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs font-mono space-y-1">
+          <div class="flex justify-between text-slate-400"><span>Speed Limit:</span><span class="text-white">80 km/h</span></div>
+          <div class="flex justify-between text-slate-400"><span>Heading:</span><span class="text-cyan-400">042° NNE</span></div>
+          <div class="flex justify-between text-slate-400"><span>Elevation:</span><span class="text-white">142 m</span></div>
+        </div>
+      </div>
+
+      <!-- Live Radar Map Card -->
+      <div class="md:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-cyan-400">Tactical Route Hazard Radar</h3>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">2 Hazards in Range</span>
+        </div>
+        <div class="h-48 bg-slate-950 rounded-xl border border-slate-800 relative flex items-center justify-center overflow-hidden">
+          <div class="w-36 h-36 rounded-full border border-cyan-500/20 absolute"></div>
+          <div class="w-24 h-24 rounded-full border border-cyan-500/30 absolute"></div>
+          <div class="w-12 h-12 rounded-full border border-cyan-500/40 absolute"></div>
+          <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 absolute shadow-lg shadow-cyan-400"></div>
+          <!-- Hazard Blips -->
+          <div class="absolute top-10 right-20 w-3 h-3 rounded-full bg-amber-400 animate-ping"></div>
+          <div class="absolute bottom-8 left-16 w-3 h-3 rounded-full bg-rose-500"></div>
+          <span class="absolute bottom-2 left-3 text-[10px] font-mono text-slate-500">Radar Sweep 1.5km Radius</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

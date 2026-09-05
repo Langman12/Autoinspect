@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoGuard AI - Pathology Matrix Replica</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center font-black text-white text-base shadow-lg shadow-cyan-900/30">AG</div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-lg font-black tracking-tight text-white">AutoGuard AI</h1>
+            <span class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/80">GDVF v2.5</span>
+          </div>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">Vehicle Forensics & Tactical GPS</p>
+        </div>
+      </div>
+      <nav class="flex gap-1 bg-slate-900/90 border border-slate-800 rounded-2xl p-1">
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">🎥 Inspect</span>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">🛡️ Guardian GPS</span>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">📊 Fleet Analytics</span>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md">🔬 Pathology Matrix</span>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">📡 Intel Hub</span>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">🧪 Test Lab</span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-5xl w-full mx-auto p-4 md:p-6 space-y-6">
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+        <div>
+          <h2 class="text-sm font-black text-white uppercase tracking-wider">Universal Vehicle Pathology Matrix</h2>
+          <p class="text-xs text-slate-400">Acoustic, physical, chemical, and ADAS diagnostic fault directory</p>
+        </div>
+        <div class="flex gap-2">
+          <input type="text" placeholder="Search symptoms, causes, frequencies..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div class="flex flex-wrap gap-2">
+        <span class="px-3 py-1 rounded-xl text-xs font-bold bg-cyan-950 text-cyan-300 border border-cyan-800">All (18)</span>
+        <span class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-950 text-slate-400 border border-slate-800">Acoustic (5)</span>
+        <span class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-950 text-slate-400 border border-slate-800">Exhaust Smoke (3)</span>
+        <span class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-950 text-slate-400 border border-slate-800">Undercarriage (4)</span>
+        <span class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-950 text-slate-400 border border-slate-800">EV & Hybrid (3)</span>
+        <span class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-950 text-slate-400 border border-slate-800">ADAS & Safety (3)</span>
+      </div>
+
+      <!-- Pathology Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="bg-slate-950 border border-rose-800/60 rounded-xl p-3 space-y-2">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">CRITICAL · Acoustic</span>
+            <span class="text-[10px] font-mono text-slate-400">200 Hz - 800 Hz</span>
+          </div>
+          <h4 class="text-xs font-bold text-white">Deep metallic knocking at idle (600-800 RPM)</h4>
+          <p class="text-xs text-slate-400">Root Cause: Connecting rod bearing spun or severe piston slap.</p>
+          <div class="p-2 bg-rose-950/40 rounded border border-rose-900 text-[11px] text-rose-300 font-medium">
+            🔴 FAIL ENGINE — TOW TRUCK ONLY. Rebuild required.
+          </div>
+        </div>
+
+        <div class="bg-slate-950 border border-amber-800/60 rounded-xl p-3 space-y-2">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">HIGH · Undercarriage</span>
+            <span class="text-[10px] font-mono text-slate-400">Tolerance > 1.0mm</span>
+          </div>
+          <h4 class="text-xs font-bold text-white">Parallel clamp marks on pinch welds</h4>
+          <p class="text-xs text-slate-400">Root Cause: Vehicle mounted on frame-pulling bench after crash.</p>
+          <div class="p-2 bg-amber-950/40 rounded border border-amber-900 text-[11px] text-amber-300 font-medium">
+            🟡 PRIOR CRASH CONCEALMENT — Laser frame alignment verification mandatory.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

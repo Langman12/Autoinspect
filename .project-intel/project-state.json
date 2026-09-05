@@ -1,0 +1,36 @@
+{
+  "projectId": "autoguard-ai",
+  "projectName": "AutoGuard AI (GDVF & Guardian GPS)",
+  "version": "1.0.1",
+  "analyzedAt": "2026-09-04T22:17:00+02:00",
+  "analyzer": "ProjectIntel v2.5",
+  "techStack": {
+    "runtime": "Node.js (v24+)",
+    "framework": "React 19.2.3 (Vite 6.2.0)",
+    "language": "TypeScript 5.8.2",
+    "styling": "Tailwind CSS 3.4.1 + PostCSS",
+    "storage": "Browser IndexedDB (AutoGuardDB v1) + LocalStorage Fallback",
+    "aiEngines": [
+      "Ollama Local Runtime (v0.32.14, models: deepseek-r1:1.5b, qwen2.5:1.5b, moondream:latest, llama3.2:3b, magistral:24b)",
+      "Google Gemini Cloud API (gemini-2.5-pro-preview, gemini-2.0-flash-live via @google/genai SDK v0.7.0)"
+    ],
+    "externalAPIs": [
+      "Open-Meteo Weather Forecast & Geocoding API",
+      "NHTSA Vehicle Recall API (api.nhtsa.dot.gov)",
+      "Firebase (Auth, Firestore, Storage v10.12.0) [Optional]"
+    ],
+    "visualization": "Recharts 2.12.0, HTML5 Canvas Web Audio API (AnalyserNode FFT 512 + 20Hz BiquadFilter)"
+  },
+  "maturityLevel": "Hardened Production-Ready Prototype",
+  "architecturePattern": "Client-Side Multimodal Single Page Application with Local/Cloud Hybrid AI Ingestion",
+  "healthStatus": {
+    "typeCheck": "PASS (0 errors)",
+    "storageEngine": "INDEXED_DB_ENABLED",
+    "securityAudit": "HTML_SANITIZED",
+    "localAIConnectivity": "ONLINE (Ollama v0.32.14, 91ms ping)",
+    "openMeteoIntegration": "OPERATIONAL",
+    "cloudGeminiIntegration": "CONFIGURED_WITH_FALLBACK"
+  },
+  "openP0Blockers": 0,
+  "openP1Risks": 2
+}

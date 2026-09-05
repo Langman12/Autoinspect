@@ -1,0 +1,61 @@
+# AutoGuard AI — Cursor Architecture & Domain Rules
+
+## 1. Project Overview & Tech Stack
+- **Project:** AutoGuard AI — Automotive Forensic Intelligence & Tactical Driving Copilot
+- **Author / Lead:** Andries Liebenberg
+- **Frontend Stack:** React 19, TypeScript 5.8 (Strict Mode), Vite 6, Tailwind CSS 3.4
+- **AI Subsystems:** Dual Hybrid Architecture (Local Ollama Daemon + Cloud Google Gemini 2.5 Pro / Flash Live WebSockets)
+- **Audio DSP:** Web Audio API 20Hz–20kHz acoustic spectrum analysis with Biquad high-pass filtering (20Hz cutoff)
+- **Telemetry:** Open-Meteo Road Physics, NHTSA Vehicle Safety Recalls API
+- **Persistence:** Local-first IndexedDB (`AutoGuardDB`, store `inspection_reports`) with fallback memory buffer
+
+---
+
+## 2. Automotive Forensic Domain Rules (GDVF Protocols)
+
+### Protocol 1: Panel Beater & Prior Collision Detection
+- Flag uneven panel gaps (> ±1mm factory tolerance).
+- Detect orange-peel waviness on reflective surfaces (Bondo body filler).
+- Detect paint overspray on rubber seals, fasteners, and door jambs.
+
+### Protocol 2: Undercarriage & Structural Metallurgy
+- Frame rail straightness: Flag parallel linear clamp marks (frame pullers) or kinks.
+- Rust Classification: `NONE` | `SURFACE` (structurally sound) | `STRUCTURAL_ROT` (immediate hazard).
+- Fresh localized undercoating spray = suspicious rust or structural weld cover-up.
+
+### Protocol 3: Acoustic Diagnostic Spectrum (20Hz – 20kHz)
+- **20Hz – 200Hz:** Structural resonance, exhaust drone, bottom-end transmission rumble.
+- **200Hz – 800Hz:** Engine rod knock, piston slap, valve train noise (**CRITICAL severity** if knock at 600-800Hz idle).
+- **800Hz – 2kHz:** Brake squeal onset, serpentine belt slip, CV joint click.
+- **2kHz – 8kHz:** Wheel bearing whir, alternator diode whine.
+- **8kHz – 20kHz:** High-frequency bearing distress, brake glazing, turbocharger whistle.
+
+### Protocol 4: Safety & Road Readiness Logic
+- `finalDecision` MUST be `TOW TRUCK ONLY` if any of these conditions are met:
+  1. Deployed airbag not replaced OR airbag warning light illuminated.
+  2. Brake fluid empty OR brake pedal travel to floor.
+  3. Frame rail kinked, cracked, or clamp-straightened.
+  4. Tire tread at or below 2/32" legal minimum OR sidewall bulge/puncture.
+  5. Active brake, fuel, or steering fluid leak.
+  6. Severe wheel bearing acoustic failure.
+- `finalDecision` is `SAFE TO DRIVE` only when none of the above apply AND `overallHealth >= 40`.
+
+---
+
+## 3. Telemetry & Road Physics Formulas
+
+### Open-Meteo Road Surface Grip Index (15% – 99%)
+- Baseline nominal dry asphalt: 95% grip, 120 km/h safe speed.
+- **Hydroplaning:** If precipitation > 4.0 mm/h or WMO codes `[65, 82, 95, 96, 99]`: Grip -= 38, Safe Speed <= 70 km/h.
+- **Black Ice Hazard:** If temperature <= 2.5°C AND (precip > 0 OR humidity > 80% OR WMO freezing rain `[56, 57, 66, 67, 71, 73, 75, 85, 86]`): Grip -= 50, Safe Speed <= 50 km/h.
+- **Crosswinds:** If gusts > 55 km/h: Grip -= 15, Safe Speed <= 80 km/h.
+- **Fog / Low Visibility:** If visibility < 800m: Safe Speed <= 60 km/h.
+
+---
+
+## 4. Coding & Architecture Standards
+1. **TypeScript:** Strict mode enabled. Never use unconstrained `any` on exported service boundaries.
+2. **Component Lifecycle:** All Web Audio contexts (`AudioContext`), camera streams (`MediaStreamTrack`), and WebSockets MUST be cleanly torn down in `useEffect` unmount returns.
+3. **Null Safety:** Always use optional chaining and defensive default fallbacks for LLM-generated JSON fields (`report.damages[i].estimatedCost?.low || 'N/A'`).
+4. **Testing:** Zero-dependency Node.js test runner using `node:test` and `node:assert/strict`. All tests run via `node --experimental-strip-types scripts/run-all-tests.mjs`.
+5. **Styling:** Dark mode first. Use curated palette tokens: Slate (`bg-slate-900`, `bg-slate-950`), Cyan (`text-cyan-400`, `border-cyan-500`), Emerald (`text-emerald-400`, `bg-emerald-950`), Red (`bg-red-950`, `text-red-400`).

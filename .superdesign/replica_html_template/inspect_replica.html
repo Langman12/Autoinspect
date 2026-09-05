@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoGuard AI - Inspect View Replica</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #020617; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+    .hud-crosshair {
+      background: radial-gradient(circle at center, transparent 40%, rgba(2, 6, 23, 0.6) 100%);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+  <!-- Top Navigation Bar -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center font-black text-white text-base shadow-lg shadow-cyan-900/30">AG</div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-lg font-black tracking-tight text-white">AutoGuard AI</h1>
+            <span class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/80">GDVF v2.5</span>
+          </div>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">Vehicle Forensics & Tactical GPS</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-emerald-600/60 bg-emerald-950/60 text-emerald-300 text-xs font-mono font-semibold">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="flex flex-col text-left">
+            <span class="text-[11px] font-black uppercase tracking-wider">🤖 Local AI (Ollama)</span>
+            <span class="text-[9px] text-slate-400">qwen2.5-coder:7b · Online</span>
+          </span>
+        </div>
+        <nav class="flex gap-1 bg-slate-900/90 border border-slate-800 rounded-2xl p-1">
+          <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md">🎥 Inspect</span>
+          <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">🛡️ Guardian GPS</span>
+          <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">📊 Fleet Analytics</span>
+          <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">🔬 Pathology Matrix</span>
+          <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">📡 Intel Hub</span>
+          <span class="px-3 py-1.5 rounded-xl text-xs font-black uppercase text-slate-400">🧪 Test Lab</span>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl w-full mx-auto p-4 md:p-6 space-y-6">
+    <!-- Vehicle Selection Bar -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-xl">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">⚡</span>
+        <div>
+          <h2 class="text-sm font-black text-white">Tesla Model Y Long Range</h2>
+          <p class="text-xs text-slate-400 font-mono">VIN: 5YJ3E1EB8NF123456 · 2023 · Electric (EV) · 32,000 km</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl border border-slate-700 transition">Sample Profiles</button>
+        <button class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-xs font-bold rounded-xl text-white shadow-md">Edit Profile</button>
+      </div>
+    </div>
+
+    <!-- Camera / Visual Inspection Card -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-black uppercase tracking-wider text-cyan-400">Forensic Video Feed</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">1080p @ 60FPS</span>
+        </div>
+        <div class="flex gap-2">
+          <button class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-emerald-500">▶ Start Live Gemini Audio</button>
+          <button class="px-3 py-1.5 bg-cyan-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-cyan-500">📷 Capture Phase Frame</button>
+        </div>
+      </div>
+
+      <!-- Mock Viewport -->
+      <div class="relative w-full aspect-video bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center hud-crosshair">
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-500">
+          <div class="w-16 h-16 rounded-full border-2 border-dashed border-cyan-500/40 flex items-center justify-center text-2xl">📸</div>
+          <p class="text-xs font-mono mt-2 text-slate-400">Camera Feed Inactive / Standby</p>
+          <p class="text-[11px] text-cyan-400 font-mono mt-1">Phase 1 of 6: Front Bumper, Headlights & ADAS Zone</p>
+        </div>
+        <!-- Reticle -->
+        <div class="absolute top-4 left-4 border-t-2 border-l-2 border-cyan-500 w-6 h-6"></div>
+        <div class="absolute top-4 right-4 border-t-2 border-r-2 border-cyan-500 w-6 h-6"></div>
+        <div class="absolute bottom-4 left-4 border-b-2 border-l-2 border-cyan-500 w-6 h-6"></div>
+        <div class="absolute bottom-4 right-4 border-b-2 border-r-2 border-cyan-500 w-6 h-6"></div>
+      </div>
+
+      <!-- Phase Steps -->
+      <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+        <div class="p-2 rounded-xl bg-cyan-950/60 border border-cyan-700/80 text-center">
+          <div class="text-[10px] font-bold text-cyan-300">1. Front</div>
+          <div class="text-[9px] text-cyan-400/80">Active</div>
+        </div>
+        <div class="p-2 rounded-xl bg-slate-950 border border-slate-800 text-center opacity-60">
+          <div class="text-[10px] font-bold text-slate-400">2. Side</div>
+          <div class="text-[9px] text-slate-500">Pending</div>
+        </div>
+        <div class="p-2 rounded-xl bg-slate-950 border border-slate-800 text-center opacity-60">
+          <div class="text-[10px] font-bold text-slate-400">3. Engine</div>
+          <div class="text-[9px] text-slate-500">Pending</div>
+        </div>
+        <div class="p-2 rounded-xl bg-slate-950 border border-slate-800 text-center opacity-60">
+          <div class="text-[10px] font-bold text-slate-400">4. Chassis</div>
+          <div class="text-[9px] text-slate-500">Pending</div>
+        </div>
+        <div class="p-2 rounded-xl bg-slate-950 border border-slate-800 text-center opacity-60">
+          <div class="text-[10px] font-bold text-slate-400">5. Interior</div>
+          <div class="text-[9px] text-slate-500">Pending</div>
+        </div>
+        <div class="p-2 rounded-xl bg-slate-950 border border-slate-800 text-center opacity-60">
+          <div class="text-[10px] font-bold text-slate-400">6. Acoustic</div>
+          <div class="text-[9px] text-slate-500">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acoustic Diagnostic Stethoscope -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-black uppercase tracking-wider text-cyan-400">Acoustic Stethoscope Analysis</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">44.1 kHz Sample Rate</span>
+        </div>
+        <button class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-md">🎙️ Record 10s Idle / Rev</button>
+      </div>
+      <div class="h-24 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-center p-2 relative overflow-hidden">
+        <div class="flex items-end gap-1 h-full w-full opacity-40">
+          <div class="flex-1 bg-cyan-500 h-1/4 rounded-t"></div>
+          <div class="flex-1 bg-cyan-500 h-1/2 rounded-t"></div>
+          <div class="flex-1 bg-cyan-500 h-3/4 rounded-t"></div>
+          <div class="flex-1 bg-blue-500 h-full rounded-t"></div>
+          <div class="flex-1 bg-cyan-500 h-2/3 rounded-t"></div>
+          <div class="flex-1 bg-cyan-500 h-1/3 rounded-t"></div>
+          <div class="flex-1 bg-cyan-500 h-1/4 rounded-t"></div>
+        </div>
+        <span class="absolute text-xs font-mono text-slate-400">Idle Spectrum Analyzer · Ready</span>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-900 py-4 text-center text-xs text-slate-600 font-mono">
+    AutoGuard AI — Global Director of Vehicle Forensics & Reconditioning (GDVF) · Universal Vehicle Diagnostic Engine
+  </footer>
+</body>
+</html>

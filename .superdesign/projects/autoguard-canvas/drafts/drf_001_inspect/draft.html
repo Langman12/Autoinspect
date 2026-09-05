@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoGuard AI - Inspect Hub (Superdesign Draft drf_001)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;0,800;1,400&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #020617;
+      color: #f1f5f9;
+      font-family: 'Outfit', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .laser-scan {
+      background: linear-gradient(180deg, rgba(34, 211, 238, 0) 0%, rgba(34, 211, 238, 0.4) 90%, rgba(34, 211, 238, 0.9) 100%);
+      animation: scanAnim 3.5s ease-in-out infinite;
+    }
+    @keyframes scanAnim {
+      0% { top: -100%; }
+      50% { top: 0%; }
+      100% { top: 100%; }
+    }
+    .hud-border {
+      box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.25), inset 0 0 15px -3px rgba(6, 182, 212, 0.15);
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(51, 65, 85, 0.5);
+    }
+    .glass-glow-cyan {
+      box-shadow: 0 8px 32px 0 rgba(6, 182, 212, 0.15);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-slate-950">
+  <!-- Tactical HUD Header -->
+  <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-xl sticky top-0 z-50 px-4 py-3">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3 w-full md:w-auto justify-between">
+        <div class="flex items-center gap-3 cursor-pointer">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 flex items-center justify-center font-black text-white text-base shadow-xl shadow-cyan-900/40 border border-cyan-400/30">
+            AG
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-1.5">
+                AutoGuard AI
+                <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded-md bg-cyan-950/80 text-cyan-300 border border-cyan-600/60 tracking-wider">GDVF v2.5</span>
+              </h1>
+            </div>
+            <p class="text-[10px] uppercase tracking-[0.25em] text-slate-400 font-bold">Multimodal Forensic Vehicle Suite</p>
+          </div>
+        </div>
+
+        <!-- Mobile AI switch -->
+        <div class="md:hidden flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs font-mono text-emerald-400">Ollama 7B</span>
+        </div>
+      </div>
+
+      <!-- Navigation & AI Telemetry -->
+      <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end overflow-x-auto">
+        <div class="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl border border-emerald-500/40 bg-emerald-950/40 text-emerald-300 text-xs font-mono shadow-lg shadow-emerald-950/30">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400 animate-pulse"></span>
+          <div class="text-left">
+            <div class="text-[10px] font-black uppercase tracking-wider text-emerald-300">Local Neural Engine</div>
+            <div class="text-[9px] text-emerald-400/80 font-mono">Qwen2.5-Coder:7B · Active</div>
+          </div>
+        </div>
+
+        <nav class="flex gap-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl p-1 shadow-inner">
+          <button class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold uppercase bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-900/40 flex items-center gap-1.5">
+            <span>🎥</span><span>Inspect</span>
+          </button>
+          <button class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
+            <span>🛡️</span><span>Guardian GPS</span>
+          </button>
+          <button class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
+            <span>🔬</span><span>Pathology</span>
+          </button>
+          <button class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
+            <span>🧪</span><span>Test Lab</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Canvas -->
+  <main class="max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6 flex-1">
+    
+    <!-- Top Vehicle Dossier Bar -->
+    <div class="glass-card rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-slate-800/80 glass-glow-cyan">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-cyan-950/60 border border-cyan-500/40 flex items-center justify-center text-2xl shadow-inner">
+          ⚡
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-base font-black text-white tracking-tight">Tesla Model Y Long Range AWD</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-950/80 text-blue-300 border border-blue-700/60 font-bold">LUXURY EV</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 font-bold">NHTSA CLEAR</span>
+          </div>
+          <p class="text-xs text-slate-400 font-mono mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span>VIN: <strong class="text-cyan-300">5YJ3E1EB8NF123456</strong></span>
+            <span>·</span>
+            <span>Year: 2023</span>
+            <span>·</span>
+            <span>Odometer: 32,000 km</span>
+            <span>·</span>
+            <span>Dual Motor 384 hp</span>
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <button class="flex-1 md:flex-none px-3.5 py-2 bg-slate-800/90 hover:bg-slate-700 text-xs font-bold rounded-xl border border-slate-700 text-slate-200 transition">Switch Vehicle</button>
+        <button class="flex-1 md:flex-none px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-xs font-bold rounded-xl text-white shadow-lg shadow-cyan-900/30 transition">Compile Report</button>
+      </div>
+    </div>
+
+    <!-- Dual Column Forensic Viewport -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Primary Multimodal Camera HUD (2 Columns) -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="glass-card rounded-2xl p-4 border border-slate-800 space-y-3">
+          
+          <!-- Viewport Header Controls -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="flex h-2.5 w-2.5 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
+              </span>
+              <span class="text-xs font-black uppercase tracking-wider text-cyan-300 font-mono">OPTICAL FORENSIC FEED</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700">4K 60FPS · ADAS ALIGNED</span>
+            </div>
+            <div class="flex gap-2">
+              <button id="liveAudioBtn" onclick="toggleLiveAudio()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-950/40 transition flex items-center gap-1.5">
+                <span>🎙️</span><span id="liveAudioLabel">Gemini Live Co-Pilot</span>
+              </button>
+              <button onclick="simulateCapture()" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-900/40 transition flex items-center gap-1.5">
+                <span>📸</span><span>Capture Phase Frame</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Video Viewport / Tactical Crosshair HUD -->
+          <div class="relative w-full aspect-video bg-slate-950 rounded-xl overflow-hidden border border-slate-800 hud-border flex items-center justify-center group">
+            
+            <!-- Laser Scan Line -->
+            <div class="absolute inset-x-0 h-24 laser-scan pointer-events-none"></div>
+
+            <!-- Optical Reticle Graphics -->
+            <div class="absolute top-4 left-4 border-t-2 border-l-2 border-cyan-400 w-8 h-8 pointer-events-none"></div>
+            <div class="absolute top-4 right-4 border-t-2 border-r-2 border-cyan-400 w-8 h-8 pointer-events-none"></div>
+            <div class="absolute bottom-4 left-4 border-b-2 border-l-2 border-cyan-400 w-8 h-8 pointer-events-none"></div>
+            <div class="absolute bottom-4 right-4 border-b-2 border-r-2 border-cyan-400 w-8 h-8 pointer-events-none"></div>
+            
+            <!-- Pitch & Roll Artificial Horizon Indicator -->
+            <div class="absolute top-4 left-16 text-[10px] font-mono text-cyan-400/80 space-y-0.5 pointer-events-none">
+              <div>AZ: 184.2° · ROLL: +0.2°</div>
+              <div>DISTANCE: 1.45m</div>
+            </div>
+
+            <div class="absolute top-4 right-16 text-right text-[10px] font-mono text-cyan-400/80 space-y-0.5 pointer-events-none">
+              <div>LUX: 840 · HDR ON</div>
+              <div>ZOOM: 1.0X FORENSIC</div>
+            </div>
+
+            <!-- Central VIN / Defect Recognition Target -->
+            <div class="relative z-10 flex flex-col items-center justify-center p-6 text-center max-w-md">
+              <div class="w-20 h-20 rounded-full border border-cyan-500/40 flex items-center justify-center relative">
+                <div class="w-14 h-14 rounded-full border border-dashed border-cyan-400 animate-spin"></div>
+                <span class="text-3xl absolute">🚗</span>
+              </div>
+              <div id="hudPhaseTitle" class="text-sm font-black text-white mt-3 uppercase tracking-wider">
+                Phase 1: Front Bumper & ADAS Radar Array
+              </div>
+              <div id="hudGuidance" class="text-xs text-slate-400 font-mono mt-1 leading-relaxed bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800">
+                Align bumper crosshairs. Scanning for micro-abrasions, repainted fascia & sensor misalignment.
+              </div>
+
+              <!-- Live AI Bounding Box Tag -->
+              <div class="mt-3 px-3 py-1 bg-emerald-950/80 border border-emerald-500/60 rounded-lg text-emerald-300 text-[11px] font-mono flex items-center gap-2 shadow-lg">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>VIN OCR VALIDATED: 5YJ3E1EB8NF123456 (99.8% Match)</span>
+              </div>
+            </div>
+
+            <!-- Bottom Crosshair Scale -->
+            <div class="absolute bottom-3 inset-x-0 flex justify-center items-center gap-4 text-[10px] font-mono text-slate-500">
+              <span>[-20]</span><span>[-10]</span><span class="text-cyan-400 font-bold">[ 0.00 GAUGING ]</span><span>[+10]</span><span>[+20]</span>
+            </div>
+          </div>
+
+          <!-- 6-Phase Step Navigator -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 pt-2">
+            <button onclick="setPhase(0)" id="phase-0" class="phase-btn p-2 rounded-xl bg-cyan-950/80 border border-cyan-500 text-left transition shadow-md">
+              <div class="text-[10px] font-extrabold text-cyan-300">1. Front</div>
+              <div class="text-[9px] text-cyan-400/80 font-mono">In Progress</div>
+            </button>
+            <button onclick="setPhase(1)" id="phase-1" class="phase-btn p-2 rounded-xl bg-slate-900 border border-slate-800 text-left transition hover:border-slate-700">
+              <div class="text-[10px] font-bold text-slate-300">2. Side & Gaps</div>
+              <div class="text-[9px] text-slate-500 font-mono">Pending</div>
+            </button>
+            <button onclick="setPhase(2)" id="phase-2" class="phase-btn p-2 rounded-xl bg-slate-900 border border-slate-800 text-left transition hover:border-slate-700">
+              <div class="text-[10px] font-bold text-slate-300">3. Engine Bay</div>
+              <div class="text-[9px] text-slate-500 font-mono">Pending</div>
+            </button>
+            <button onclick="setPhase(3)" id="phase-3" class="phase-btn p-2 rounded-xl bg-slate-900 border border-slate-800 text-left transition hover:border-slate-700">
+              <div class="text-[10px] font-bold text-slate-300">4. Undercarriage</div>
+              <div class="text-[9px] text-slate-500 font-mono">Pending</div>
+            </button>
+            <button onclick="setPhase(4)" id="phase-4" class="phase-btn p-2 rounded-xl bg-slate-900 border border-slate-800 text-left transition hover:border-slate-700">
+              <div class="text-[10px] font-bold text-slate-300">5. Interior/Airbag</div>
+              <div class="text-[9px] text-slate-500 font-mono">Pending</div>
+            </button>
+            <button onclick="setPhase(5)" id="phase-5" class="phase-btn p-2 rounded-xl bg-slate-900 border border-slate-800 text-left transition hover:border-slate-700">
+              <div class="text-[10px] font-bold text-slate-300">6. Acoustic Idle</div>
+              <div class="text-[9px] text-slate-500 font-mono">Pending</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Acoustic Stethoscope & Live AI Audit Feed -->
+      <div class="space-y-4">
+        
+        <!-- Acoustic Visualizer Card -->
+        <div class="glass-card rounded-2xl p-4 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-black uppercase tracking-wider text-cyan-400 font-mono">ACOUSTIC STETHOSCOPE</span>
+              <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">FFT 44.1kHz</span>
+            </div>
+            <button id="toggleOscBtn" onclick="toggleOscillator()" class="px-2.5 py-1 bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-cyan-300 text-[10px] font-mono rounded-lg transition font-bold">
+              ⚡ Test Tone
+            </button>
+          </div>
+
+          <!-- Canvas Waveform -->
+          <div class="h-28 bg-slate-950 rounded-xl border border-slate-800 relative overflow-hidden flex items-center justify-center p-2">
+            <canvas id="waveformCanvas" class="w-full h-full"></canvas>
+            <div class="absolute top-2 left-2 text-[9px] font-mono text-cyan-400/80 bg-slate-950/80 px-1.5 py-0.5 rounded border border-slate-800">
+              PEAK: <span id="peakFreq">142 Hz</span> (Baseline Combustion)
+            </div>
+            <div class="absolute top-2 right-2 text-[9px] font-mono text-emerald-400/90 bg-slate-950/80 px-1.5 py-0.5 rounded border border-slate-800">
+              THD: 0.04% · NORMAL
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+            <div class="p-2 bg-slate-950 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 block uppercase">Harmonic Order</span>
+              <strong class="text-white">1.0x (820 RPM)</strong>
+            </div>
+            <div class="p-2 bg-slate-950 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 block uppercase">Defect Probability</span>
+              <strong class="text-emerald-400">0.02 (Nominal)</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time AI Auditor Findings Stream -->
+        <div class="glass-card rounded-2xl p-4 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-300">Live AI Findings Log</h3>
+            <span class="text-[10px] font-mono text-slate-400">3 Verified</span>
+          </div>
+
+          <div class="space-y-2 text-xs font-mono max-h-48 overflow-y-auto pr-1">
+            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 flex items-start gap-2.5">
+              <span class="text-emerald-400 mt-0.5">✓</span>
+              <div>
+                <span class="text-white font-bold">Front Fascia Factory Fit</span>
+                <p class="text-[11px] text-slate-400">Panel gap measures 3.2mm consistently. Original factory clips verified.</p>
+              </div>
+            </div>
+
+            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 flex items-start gap-2.5">
+              <span class="text-emerald-400 mt-0.5">✓</span>
+              <div>
+                <span class="text-white font-bold">Radar ADAS Calibration</span>
+                <p class="text-[11px] text-slate-400">Bumper radar emitter bracket intact. No crash compression detected.</p>
+              </div>
+            </div>
+
+            <div class="p-2.5 bg-slate-950 rounded-xl border border-amber-800/60 bg-amber-950/20 flex items-start gap-2.5">
+              <span class="text-amber-400 mt-0.5">⚠️</span>
+              <div>
+                <span class="text-amber-200 font-bold">Minor Stone Chip (2mm)</span>
+                <p class="text-[11px] text-amber-300/80">Clearcoat nick on lower valence. Reconditioning cost: $25.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-900 py-3 text-center text-xs text-slate-500 font-mono">
+    AutoGuard AI Design Canvas · drf_001_inspect · Superdesign Architecture
+  </footer>
+
+  <script>
+    const phases = [
+      { title: "Phase 1: Front Bumper & ADAS Radar Array", guidance: "Align bumper crosshairs. Scanning for micro-abrasions, repainted fascia & sensor misalignment." },
+      { title: "Phase 2: Side Panels & Door Jamb Pinch Welds", guidance: "Scan B-pillar VIN decals, measure door shut lines (±1.0mm tolerance), check for Bondo filler." },
+      { title: "Phase 3: Engine Bay / Electric Drive Unit", guidance: "Inspect high-voltage orange cables, inverter coolant reservoir level, and strut tower welds." },
+      { title: "Phase 4: Undercarriage & Battery Pack Armor", guidance: "Scan underbody skid trays, battery casing puncture marks, and frame clamp scars." },
+      { title: "Phase 5: Interior, Airbag Seams & Steering HUD", guidance: "Verify steering wheel airbag stitching, pedal rubber wear vs odometer, and seatbelt retractors." },
+      { title: "Phase 6: Acoustic Idle & Throttle Harmonic Rev", guidance: "Recording 10s audio. Detecting bearing cavitation, inverter whine, or motor rotor harmonics." }
+    ];
+
+    function setPhase(index) {
+      document.getElementById('hudPhaseTitle').innerText = phases[index].title;
+      document.getElementById('hudGuidance').innerText = phases[index].guidance;
+      document.querySelectorAll('.phase-btn').forEach((btn, idx) => {
+        if (idx === index) {
+          btn.className = "phase-btn p-2 rounded-xl bg-cyan-950/80 border border-cyan-500 text-left transition shadow-md";
+          btn.querySelector('div:first-child').className = "text-[10px] font-extrabold text-cyan-300";
+        } else {
+          btn.className = "phase-btn p-2 rounded-xl bg-slate-900 border border-slate-800 text-left transition hover:border-slate-700";
+          btn.querySelector('div:first-child').className = "text-[10px] font-bold text-slate-300";
+        }
+      });
+    }
+
+    // Waveform Animation
+    const canvas = document.getElementById('waveformCanvas');
+    const ctx = canvas.getContext('2d');
+    let animationFrame;
+    let waveActive = true;
+    let step = 0;
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function drawWave() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const width = canvas.width;
+      const height = canvas.height;
+      const mid = height / 2;
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#22d3ee';
+      ctx.beginPath();
+
+      for (let x = 0; x < width; x++) {
+        const freq1 = Math.sin((x + step * 4) * 0.03);
+        const freq2 = Math.sin((x + step * 2) * 0.08) * 0.5;
+        const freq3 = Math.sin((x - step * 3) * 0.01) * 0.3;
+        const y = mid + (freq1 + freq2 + freq3) * (height * 0.3);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Spectral bars
+      const barCount = 32;
+      const barWidth = width / barCount;
+      for (let i = 0; i < barCount; i++) {
+        const barHeight = Math.abs(Math.sin(i * 0.3 + step * 0.1)) * (height * 0.6);
+        ctx.fillStyle = i < 8 ? 'rgba(34, 211, 238, 0.4)' : i < 24 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(168, 85, 247, 0.25)';
+        ctx.fillRect(i * barWidth + 2, height - barHeight, barWidth - 4, barHeight);
+      }
+
+      step++;
+      animationFrame = requestAnimationFrame(drawWave);
+    }
+    drawWave();
+
+    function toggleLiveAudio() {
+      const btn = document.getElementById('liveAudioBtn');
+      const label = document.getElementById('liveAudioLabel');
+      if (label.innerText.includes('Active')) {
+        label.innerText = 'Gemini Live Co-Pilot';
+        btn.className = 'px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-1.5';
+      } else {
+        label.innerText = 'Live Co-Pilot Active';
+        btn.className = 'px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-1.5 animate-pulse';
+      }
+    }
+
+    function simulateCapture() {
+      alert('Snapshot captured for current phase! Running neural forensic analysis on frame...');
+    }
+
+    function toggleOscillator() {
+      const peak = document.getElementById('peakFreq');
+      const freqs = ['142 Hz', '420 Hz (Knock)', '2,600 Hz (Tick)', '5,200 Hz (Whine)', '80 Hz'];
+      const next = freqs[Math.floor(Math.random() * freqs.length)];
+      peak.innerText = next;
+    }
+  </script>
+</body>
+</html>

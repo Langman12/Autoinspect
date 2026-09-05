@@ -1,0 +1,14 @@
+{
+  "id": "autoguard-canvas",
+  "title": "AutoGuard AI - Full Suite Superdesign Canvas Overhaul",
+  "description": "Comprehensive visual and UX redesign across Inspect Hub, Tactical Guardian GPS, Forensic Pathology Matrix, and Acoustic AI Test Lab.",
+  "createdAt": "2026-09-05T02:01:00Z",
+  "designSystem": ".superdesign/design-system.md",
+  "drafts": [
+    "drf_001_inspect",
+    "drf_002_guardian",
+    "drf_003_matrix",
+    "drf_004_testlab"
+  ],
+  "activeDraft": "drf_001_inspect"
+}

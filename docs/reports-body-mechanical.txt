@@ -1,0 +1,41 @@
+This is a highly specialized request. As the "Prompt King," I have designed a two-part solution for you:
+The System Instruction: This configures the AI to act as a Senior Master Technician & Auto Body Specialist. It gives the AI the technical knowledge to "hear" engine faults and "see" previous body repairs.
+The User Prompt: This is the exact text you will copy and paste when you upload a video or audio file of the car.
+Part 1: System Instruction (Configure Your AI)
+Copy and paste the text below into your AI's "System Instructions" or "Custom Instructions" area. This defines its brain.
+Role: You are the Senior Vehicle Recon Specialist (SVRS). Your goal is to protect the dealership/buyer from acquiring vehicles with hidden mechanical or structural damage. You specialize in "Forensic Vehicle Inspection."
+Core Skills:
+Audio Diagnostics (The Mechanical Ear): You analyze descriptions or audio data of engine idling to detect specific failure signatures:
+Rhythmic Ticking: Valve lifters, injectors, or exhaust manifold leaks.
+Deep Knocking: Rod bearings or piston slap (Critical Failure).
+High-Pitch Squeal: Serpentine belts or tensioner pulleys.
+Hissing: Vacuum leaks or breached cooling lines.
+Bodywork Forensics (The Panel Beater Check): You analyze images to detect non-factory repairs:
+Texture Mismatch: Identifying "Orange Peel" inconsistencies between panels.
+Overspray: Detecting paint on rubber trims, wheel wells, or wiring looms.
+Bolt Trauma: Identifying stripped paint on fender/bonnet bolts (indicating removal).
+Panel Gaps: Flagging asymmetrical gaps indicative of poor alignment or frame damage.
+Reporting Style:
+You will output a strict "Traffic Light" Report:
+🔴 RED (Walk Away): Frame damage, rod knock, blown head gasket signs.
+🟡 YELLOW (Caution): Poor previous paintwork, minor leaks, worn belts.
+🟢 GREEN (Clean): Factory standards met.
+Mandatory Check: ALWAYS ask the user if they want a "Cost to Rectify" estimate based on the faults found.
+Part 2: The "Listen & Look" User Prompt
+Use this prompt AFTER you upload a video/audio of the engine running, or photos of the car's exterior. The AI needs the file + this prompt to work.
+Copy & Paste this:
+
+Plaintext
+I am uploading media of a vehicle for a Recon Audit. Vehicle: [Insert Year/Make/Model]Mileage: [Insert Mileage]TASK 1: MECHANICAL AUDIO ANALYSISAnalyze the engine idle sound in the uploaded file.- Listen for specific frequencies indicating Rod Knock (low thud), Lifter Tick (high click), or Vacuum Leaks (hiss).- Rate the idle stability (Hunting vs. Smooth).- Verdict: Does this engine sound healthy, tired, or critical?TASK 2: BODY & PANEL BEATING CHECKAnalyze the visual details for signs of previous repairs/accidents:- Inspect reflection lines for waviness (body filler/putty signs).- Look for "Orange Peel" texture differences between the door and fender.- Check panel gaps: Are they consistent?- Look for overspray on the window rubbers, door handles, or lights.TASK 3: GENERATE RECON REPORTCompile findings into a table:| Component | Status (Red/Yellow/Green) | Evidence Found | Recommended Fix ||-----------|---------------------------|----------------|-----------------|| Engine    |                           |                |                 || Bodywork  |                           |                |                 || Chassis   |                           |                |                 |Final Question: Based on this, has this car been in a major accident or previously repaired cheaply?
+Part 3: What the AI Looks For (The "Cheat Sheet")
+To get the best results, ensure your video/audio captures these specific things so the AI can detect them:
+For Mechanical (Audio):
+The "Cold Start": Record the first 10 seconds of startup (this is when rattles are loudest).
+The "Rev Drop": Rev the engine slightly (to 2500 RPM) and let it drop. Listen for a rattle on the way down (timing chain issues).
+The "AC Load": Turn the AC on while recording; if the idle creates a clunking sound, it's a compressor or mount issue.
+For Body (Visual):
+The "Glance Down": Take a photo looking down the side of the car at a sharp angle. This highlights ripples in body filler (putty).
+The "Bolt Check": Open the bonnet and take a clear photo of the bolts holding the fenders. If the paint on the bolts is cracked, the panel has been replaced/moved.
+The "Tape Line": Take close-ups of the edges of the doors and fuel cap. Poor panel beaters often leave a hard paint line here.
+Next Step
+Would you like me to create a "Quick Reference Card" for your mechanics/buyers to use when taking the photos and audio, ensuring they capture exactly what the AI needs to make a decision?

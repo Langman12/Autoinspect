@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoGuard AI - Guardian GPS (Superdesign Draft drf_002)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #020617;
+      color: #f1f5f9;
+      font-family: 'Outfit', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .radar-sweep {
+      background: conic-gradient(from 0deg, rgba(34, 211, 238, 0.4) 0deg, rgba(34, 211, 238, 0.05) 60deg, transparent 90deg);
+      animation: sweepRotate 4s linear infinite;
+    }
+    @keyframes sweepRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(51, 65, 85, 0.5);
+    }
+    .glass-glow-radar {
+      box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.2);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-slate-950">
+  
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-xl sticky top-0 z-50 px-4 py-3">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3 w-full md:w-auto justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-black text-white text-base shadow-xl shadow-cyan-900/40 border border-cyan-400/30">
+            AG
+          </div>
+          <div>
+            <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-1.5">
+              Tactical Guardian GPS
+              <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded-md bg-amber-950/80 text-amber-300 border border-amber-600/60 font-bold">RADAR v2.5</span>
+            </h1>
+            <p class="text-[10px] uppercase tracking-[0.25em] text-slate-400 font-bold">Live Doppler Telemetry & Threat Intercept</p>
+          </div>
+        </div>
+        <div class="md:hidden text-xs font-mono text-cyan-400 font-bold">74 KM/H</div>
+      </div>
+
+      <nav class="flex gap-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl p-1 shadow-inner">
+        <span class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase text-slate-400 cursor-pointer">🎥 Inspect</span>
+        <span class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold uppercase bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-900/40 flex items-center gap-1.5">
+          <span>🛡️</span><span>Guardian GPS</span>
+        </span>
+        <span class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase text-slate-400 cursor-pointer">🔬 Pathology</span>
+        <span class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase text-slate-400 cursor-pointer">🧪 Test Lab</span>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Canvas -->
+  <main class="max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6 flex-1">
+    
+    <!-- Weather & Threat Condition Banner -->
+    <div class="glass-card rounded-2xl p-4 border border-amber-500/40 bg-gradient-to-r from-amber-950/30 via-slate-900/90 to-slate-900/90 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-amber-950/80 border border-amber-500/50 flex items-center justify-center text-2xl shadow-inner animate-pulse">
+          ⚡
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-black text-amber-300 uppercase tracking-wider">Severe Weather Warning — Hydroplaning & Thunderstorm Ahead</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-700 font-bold">HIGH RISK</span>
+          </div>
+          <p class="text-xs text-slate-400 font-mono mt-0.5">
+            Precipitation: 18mm/hr · Wind Gusts: 64 km/h · Evasive reroute computed via Waypoint E-WP03 (Save 8.4 mins & avoids flood zones).
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <button onclick="setWeatherPreset('storm')" class="px-3 py-1.5 bg-amber-900/40 hover:bg-amber-800/60 border border-amber-600/60 text-amber-200 text-xs font-bold rounded-xl transition">Storm Preset</button>
+        <button onclick="setWeatherPreset('ice')" class="px-3 py-1.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-cyan-300 text-xs font-bold rounded-xl transition">Ice Preset</button>
+        <button onclick="alert('Evasive Route Accepted! Waypoints pushed to vehicle nav display.')" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-950/40 transition">Engage Evasive Route</button>
+      </div>
+    </div>
+
+    <!-- Grid View -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Left Column: Dynamics Gauge & Speed Control -->
+      <div class="space-y-4">
+        
+        <!-- Speed Gauge Card -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-black uppercase tracking-wider text-cyan-400 font-mono">VEHICLE VELOCITY</span>
+            <span id="speedAlertBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">WITHIN LIMIT</span>
+          </div>
+
+          <div class="flex flex-col items-center justify-center py-2">
+            <div class="flex items-baseline gap-2">
+              <span id="speedValue" class="text-6xl font-black font-mono text-white tracking-tight">74</span>
+              <span class="text-sm font-mono text-slate-400 font-bold uppercase">KM/H</span>
+            </div>
+            <div class="text-xs font-mono text-slate-400 mt-1">
+              POSTED LIMIT: <strong class="text-white">80 KM/H</strong> · HEADWAY: <strong class="text-emerald-400">42m SAFE</strong>
+            </div>
+
+            <!-- Speed Slider -->
+            <div class="w-full mt-4 space-y-1">
+              <div class="flex justify-between text-[10px] font-mono text-slate-400">
+                <span>0 km/h</span>
+                <span>Interactive Speed Simulator</span>
+                <span>160 km/h</span>
+              </div>
+              <input type="range" id="speedSlider" min="0" max="140" value="74" oninput="updateSpeed(this.value)" class="w-full accent-cyan-400 cursor-pointer">
+            </div>
+          </div>
+
+          <!-- Telemetry Specs -->
+          <div class="grid grid-cols-2 gap-2 text-xs font-mono pt-2 border-t border-slate-800/80">
+            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 block uppercase">Heading</span>
+              <strong class="text-cyan-300">042° NNE (True)</strong>
+            </div>
+            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 block uppercase">Altitude</span>
+              <strong class="text-white">312 m MSL</strong>
+            </div>
+            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 block uppercase">G-Force Vector</span>
+              <strong class="text-emerald-400">0.08G (Lateral)</strong>
+            </div>
+            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+              <span class="text-[10px] text-slate-400 block uppercase">Braking Dist</span>
+              <strong class="text-white">28.4 meters</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Voice Co-Pilot Terminal -->
+        <div class="glass-card rounded-2xl p-4 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-xs font-black uppercase tracking-wider text-slate-200">Voice Co-Pilot Terminal</span>
+            </div>
+            <span class="text-[10px] font-mono text-cyan-400">Audio Synth Ready</span>
+          </div>
+
+          <div id="voiceTranscript" class="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 space-y-2 h-36 overflow-y-auto">
+            <div class="text-cyan-400 text-[11px]">[22:14:02] Guardian Co-Pilot online. Scanning 1.5km radar corridor.</div>
+            <div class="text-slate-300 text-[11px]">[22:14:35] "Severe pothole detected in right lane at 450 meters. Hold lane center."</div>
+            <div class="text-amber-400 text-[11px]">[22:15:01] "Thunderstorm band approaching. Standing water depth exceeds 4cm. Evasive route calculated."</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right 2 Columns: Circular Doppler Radar & Topographic Map -->
+      <div class="lg:col-span-2 space-y-4">
+        
+        <!-- Radar Viewport Card -->
+        <div class="glass-card rounded-2xl p-4 border border-slate-800 space-y-4 glass-glow-radar">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+            <div>
+              <h3 class="text-xs font-black uppercase tracking-wider text-cyan-300 font-mono">1.5KM TACTICAL DOPPLER RADAR DISH</h3>
+              <p class="text-xs text-slate-400">Real-time object classification and road hazard tracking</p>
+            </div>
+            <div class="flex gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-rose-950/80 text-rose-300 border border-rose-800 text-[10px] font-mono font-bold">1 Pothole</span>
+              <span class="px-2.5 py-1 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-800 text-[10px] font-mono font-bold">1 Speed Trap</span>
+              <span class="px-2.5 py-1 rounded-lg bg-blue-950/80 text-blue-300 border border-blue-800 text-[10px] font-mono font-bold">1 Storm Cell</span>
+            </div>
+          </div>
+
+          <!-- Circular Radar Canvas Component -->
+          <div class="relative w-full aspect-video sm:aspect-[16/9] bg-slate-950 rounded-xl overflow-hidden border border-cyan-900/60 flex items-center justify-center">
+            
+            <!-- Radar Range Rings -->
+            <div class="w-[85%] aspect-square rounded-full border border-cyan-500/15 absolute pointer-events-none"></div>
+            <div class="w-[60%] aspect-square rounded-full border border-cyan-500/25 absolute pointer-events-none"></div>
+            <div class="w-[35%] aspect-square rounded-full border border-cyan-500/35 absolute pointer-events-none"></div>
+            <div class="w-[12%] aspect-square rounded-full border border-cyan-500/50 absolute pointer-events-none"></div>
+
+            <!-- Compass Axes -->
+            <div class="absolute inset-x-0 h-px bg-cyan-500/20"></div>
+            <div class="absolute inset-y-0 w-px bg-cyan-500/20"></div>
+
+            <!-- Sweeping Radar Beam -->
+            <div class="w-[85%] aspect-square rounded-full absolute pointer-events-none radar-sweep"></div>
+
+            <!-- Own Vehicle Marker (Center) -->
+            <div class="w-4 h-4 rounded-full bg-cyan-400 absolute shadow-lg shadow-cyan-400 flex items-center justify-center z-20">
+              <div class="w-1.5 h-1.5 rounded-full bg-slate-950"></div>
+            </div>
+
+            <!-- Threat Blip 1: Pothole (Warning Amber) -->
+            <button onclick="showHazardDetail('Severe Pothole (Right Lane)', '450m ahead · Impact hazard · Deflection: 15cm', 'WARNING')" class="absolute top-[28%] right-[32%] w-4 h-4 rounded-full bg-amber-400 shadow-lg shadow-amber-400/80 animate-ping z-20"></button>
+            <div class="absolute top-[28%] right-[32%] w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center text-[8px] font-bold text-slate-950 z-20 cursor-pointer" onclick="showHazardDetail('Severe Pothole (Right Lane)', '450m ahead · Impact hazard · Deflection: 15cm', 'WARNING')">!</div>
+            <span class="absolute top-[22%] right-[24%] text-[9px] font-mono text-amber-300 bg-slate-950/90 px-1.5 py-0.5 rounded border border-amber-700/60 pointer-events-none">POTHOLE 450M</span>
+
+            <!-- Threat Blip 2: Speed Trap (Info Blue) -->
+            <div onclick="showHazardDetail('Mobile Speed Radar', '800m ahead · Posted 80 km/h · Laser enforcement', 'INFO')" class="absolute bottom-[30%] left-[26%] w-3.5 h-3.5 rounded-full bg-blue-400 shadow-lg shadow-blue-400/80 z-20 cursor-pointer"></div>
+            <span class="absolute bottom-[24%] left-[20%] text-[9px] font-mono text-blue-300 bg-slate-950/90 px-1.5 py-0.5 rounded border border-blue-700/60 pointer-events-none">RADAR TRAP 800M</span>
+
+            <!-- Threat Blip 3: Standing Water Storm Cell -->
+            <div class="absolute top-[18%] left-[22%] w-24 h-16 rounded-full bg-cyan-500/10 border border-dashed border-cyan-400/30 flex items-center justify-center text-[9px] font-mono text-cyan-300 pointer-events-none">
+              STORM CELL
+            </div>
+
+            <!-- Telemetry Overlays -->
+            <div class="absolute bottom-3 left-3 text-[10px] font-mono text-slate-400 bg-slate-950/80 px-2 py-1 rounded border border-slate-800">
+              RADAR SWEEP: 360° CONTINOUS · GAIN: AUTO
+            </div>
+            <div class="absolute bottom-3 right-3 text-[10px] font-mono text-cyan-400 bg-slate-950/80 px-2 py-1 rounded border border-slate-800">
+              DOPPLER COMPASS: NNE 042°
+            </div>
+          </div>
+
+          <!-- Hazard Interactive Inspector Box -->
+          <div id="hazardDetailBox" class="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between text-xs font-mono">
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase">Selected Hazard Telemetry</span>
+              <strong id="hazardTitle" class="text-amber-300">Severe Pothole (Right Lane)</strong>
+              <p id="hazardDesc" class="text-[11px] text-slate-400 mt-0.5">450m ahead · Impact hazard · Recommend lane shift left.</p>
+            </div>
+            <button onclick="speakHazard()" class="px-3 py-1.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-cyan-300 rounded-lg font-bold text-[11px] transition">
+              🔊 Announce
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-900 py-3 text-center text-xs text-slate-500 font-mono">
+    AutoGuard AI Design Canvas · drf_002_guardian · Superdesign Architecture
+  </footer>
+
+  <script>
+    function updateSpeed(val) {
+      document.getElementById('speedValue').innerText = val;
+      const badge = document.getElementById('speedAlertBadge');
+      if (val > 80) {
+        badge.innerText = 'OVERSPEED DETECTED (+ ' + (val - 80) + ' km/h)';
+        badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold animate-pulse';
+      } else {
+        badge.innerText = 'WITHIN LIMIT';
+        badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold';
+      }
+    }
+
+    function showHazardDetail(title, desc, severity) {
+      document.getElementById('hazardTitle').innerText = title;
+      document.getElementById('hazardDesc').innerText = desc;
+      const titleElem = document.getElementById('hazardTitle');
+      titleElem.className = severity === 'WARNING' ? 'text-amber-300 font-bold' : 'text-cyan-300 font-bold';
+    }
+
+    function speakHazard() {
+      const title = document.getElementById('hazardTitle').innerText;
+      const desc = document.getElementById('hazardDesc').innerText;
+      const log = document.getElementById('voiceTranscript');
+      const time = new Date().toLocaleTimeString();
+      const newEntry = document.createElement('div');
+      newEntry.className = 'text-amber-300 text-[11px]';
+      newEntry.innerText = `[${time}] "${title}. ${desc}"`;
+      log.appendChild(newEntry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function setWeatherPreset(preset) {
+      if (preset === 'ice') {
+        alert('Switched to Alaska Black Ice Preset: Traction warning enabled.');
+      } else {
+        alert('Switched to Dallas Severe Thunderstorm Preset: Doppler flood map active.');
+      }
+    }
+  </script>
+</body>
+</html>

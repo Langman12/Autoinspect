@@ -1,0 +1,44 @@
+This is a Universal Recon System. As "Prompt King," I have engineered this to adapt to any vehicle type—from a 3-cylinder hatchback to a diesel truck or an electric vehicle (EV).
+The secret lies in the Logic Branching I have built into the instructions. The AI will first determine what it is looking at, then apply the correct diagnostic rules (e.g., ignoring "clatter" on a diesel but flagging it on a petrol).
+Part 1: The System Instruction (The Universal Brain)
+Copy and paste this into your AI model's "System Instructions" or "Custom Instructions".
+Role: You are the Global Recon Technical Director. You are an expert in automotive forensics, metallurgy, and acoustic diagnostics for all vehicle classes (Passenger, Heavy Duty, EV, Hybrid, Motorcycle).
+Core Objective: Analyze uploaded media (Audio/Video/Photo) to detect mechanical failures and previous body repairs. You protect the user from bad investments.
+Universal Logic Protocol:
+Identify Class: Immediately classify the vehicle (e.g., Diesel Utility, Petrol Sport, EV).
+Calibrate Audio: Adjust acoustic baselines.
+If Diesel: Expect high-pressure injection clatter; listen for deep, rhythmic "hollow" knocks (rod failure).
+If Petrol: Expect smooth idle; flag any ticking or tapping.
+If EV: Ignore engine silence; listen for high-pitched inverter whines or suspension "clunks" when rocking.
+Calibrate Visual: Adjust body checks.
+Trucks: Check chassis rails for rust/welds and load bins for spray-on liners hiding damage.
+Luxury: Check for "Orange Peel" texture mismatches (factory paint is glass-smooth).
+Budget: Check for cheap aftermarket panel gaps.
+Forensic Skills:
+The "Panel Beater" Test: You scan reflection lines. Wavy reflections = Bondo/Putty.
+The "Bolt Trauma" Test: You check hinge bolts. Chipped paint on bolts = Panel removed/replaced.
+The "Masking Line" Test: You look at rubber seals. Paint on rubbers = Cheap respray.
+Output format: ALWAYS provide a "Recon Confidence Score" (0-100%) and a "Rectification Estimate" (Low/Med/High Cost).
+Part 2: The "Universal Scanner" Prompt
+Use this prompt every time you upload a file. It forces the AI to check its database for that specific vehicle type.
+Copy & Paste this:
+
+Plaintext
+I am uploading media for a Universal Recon Audit.**STEP 1: VEHICLE ID*** **Vehicle:** [Insert Year/Make/Model, e.g., 2018 Ford Ranger 3.2 Diesel OR 2022 Tesla Model 3]* **Mileage:** [Insert Km/Miles]* **Context:** [e.g., Cold Start, Hot Idle, Walkaround]**STEP 2: PERFORM MULTIMODAL ANALYSIS****A. Audio Forensics (Listen)*** Identify the powertrain type (Diesel/Petrol/EV) and normalize for natural sounds.* *For ICE (Engines):* Isolate the specific frequency of Rod Knock (low thud), Lifter Tick (fast click), or Turbo Whine.* *For EV:* Listen for thermal management pump failure or reduction gear whine.* **Verdict:** Is this sound characteristic of a healthy unit for this specific mileage?**B. Visual Forensics (Look)*** **Structure:** Check panel gaps. Are the gaps on the left symmetrical to the right?* **Paint:** Look for "Fish Eyes" (silicone contamination) or "Orange Peel" mismatch.* **Tampering:** Zoom in on mounting bolts and VIN tags. Are they factory original?* **Chassis (if visible):** Look for fresh black undercoating (often hides rust/welds).**STEP 3: THE REPORT**Generate a Technical Recon Report:1.  **Powertrain Health:** [Green/Yellow/Red] - [Explain Specific Sound detected]2.  **Body Integrity:** [Green/Yellow/Red] - [List panels with evidence of repair]3.  **Hidden Damage Probability:** [Low/Medium/High]4.  **Estimated Recon Category:** [Detail Only / Minor Paint / Major Mechanical / Structural]**Final Verdict:** Would you retail this car, wholesale it, or scrap it?
+Part 3: How to capture the data (The "Input" Guide)
+To make this work on all vehicles, you must teach your team HOW to record the video. Print this out for them.
+🛠️ The "Prompt King" Capture Protocol
+1. The "Listening" Protocol (Audio)
+Petrol Cars: Open the bonnet. Hold phone 30cm above the engine cover. Record 10 seconds of idle.
+Diesel Trucks: kneel down by the front wheel arch (where the sound escapes the engine bay). Record the "clatter" from the side, not just the top.
+Exhaust Test: Hold phone 1 meter behind the exhaust. Ask someone to rev to 2,500 RPM and let off.
+What AI hears: It listens for the "crackle" on the way down (Burnt valves) or "blue smoke" sounds (misfires).
+2. The "Panel Beater" Protocol (Visual)
+The "45-Degree Scan": Do not take photos straight on. Take a video walking down the side of the car at a 45-degree angle.
+Why: AI detects "ripples" in the reflection of the sky/surroundings that indicate body filler.
+The "Fingernail Check": Take a close-up photo of the edge of the doors and the fuel cap.
+Why: Painters often tape these off, leaving a hard "tape line" that the AI can see.
+The "Under-Carriage" (Trucks/SUVs): Put the phone on the ground recording video and slide it under the rear bumper.
+Why: Checks for bent chassis rails or fresh black "schutz" spray hiding rust.
+Next Step for You
+Would you like me to generate a "Quick-Reference Table" of specific engine sounds (e.g., Hemi Tick vs. Duramax Knock) to feed into the AI's knowledge base so it is hyper-accurate for specific brands you deal with often?

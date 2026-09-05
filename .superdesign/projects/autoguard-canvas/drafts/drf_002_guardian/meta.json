@@ -1,0 +1,10 @@
+{
+  "id": "drf_002_guardian",
+  "projectId": "autoguard-canvas",
+  "title": "Tactical Guardian GPS: Combat-Grade Radar Telemetry & Route Hazard Avoidance",
+  "status": "active",
+  "mode": "branch",
+  "parent": "guardian_replica.html",
+  "createdAt": "2026-09-05T02:04:30Z",
+  "tags": ["guardian", "gps", "tactical-hud", "weather-radar", "hazard-avoidance"]
+}

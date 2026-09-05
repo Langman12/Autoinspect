@@ -1,0 +1,38 @@
+{
+  "name": "autoguard-ai",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types scripts/run-all-tests.mjs",
+    "test:unit": "node --experimental-strip-types tests/unit/weatherService.test.mjs tests/unit/recallService.test.mjs tests/unit/storageService.test.mjs tests/unit/securityXss.test.mjs tests/unit/aiService.test.mjs",
+    "test:integration": "node --experimental-strip-types tests/integration/tacticalGuardian.test.mjs tests/integration/forensicPipeline.test.mjs",
+    "test:ollama": "node scripts/test-ollama.js",
+    "test:weather": "node scripts/test-weather.js"
+  },
+  "dependencies": {
+    "@google/genai": "^0.7.0",
+    "firebase": "^10.12.0",
+    "lucide-react": "^0.475.0",
+    "motion": "^12.4.7",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^6.22.0",
+    "recharts": "^2.12.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.1",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}

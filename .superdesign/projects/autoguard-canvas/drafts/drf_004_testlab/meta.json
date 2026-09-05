@@ -1,0 +1,10 @@
+{
+  "id": "drf_004_testlab",
+  "projectId": "autoguard-canvas",
+  "title": "Acoustic Test Lab: Neural Classifier Studio & Live Confusion Matrix Heatmap",
+  "status": "active",
+  "mode": "branch",
+  "parent": "testlab_replica.html",
+  "createdAt": "2026-09-05T02:08:25Z",
+  "tags": ["testlab", "ai-evaluation", "confusion-matrix", "audio-synthesis", "neural-benchmarking"]
+}

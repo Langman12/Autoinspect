@@ -1,0 +1,10 @@
+{
+  "id": "drf_003_matrix",
+  "projectId": "autoguard-canvas",
+  "title": "Pathology Matrix: Interactive Forensic Fault Directory & Spectrogram Cross-Reference",
+  "status": "active",
+  "mode": "branch",
+  "parent": "matrix_replica.html",
+  "createdAt": "2026-09-05T02:06:30Z",
+  "tags": ["pathology", "diagnostics", "frequency-spectra", "forensics", "defect-matrix"]
+}
