@@ -14,10 +14,42 @@ if (!GEMINI_API_KEY) {
   )
 }
 
-const ANALYSIS_MODEL = 'gemini-2.5-pro-preview-05-06'
+const CANDIDATE_ANALYSIS_MODELS = [
+  'gemini-2.5-flash',
+  'gemini-2.5-pro',
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro',
+]
 const LIVE_MODEL = 'gemini-2.0-flash-live-001'
 
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY || 'missing-key' })
+
+async function generateWithModelFallback(params: {
+  contents: any
+  config?: any
+}) {
+  let lastErr: any = null
+  for (const model of CANDIDATE_ANALYSIS_MODELS) {
+    try {
+      const res = await ai.models.generateContent({
+        model,
+        contents: params.contents,
+        config: params.config,
+      })
+      return res
+    } catch (err: any) {
+      lastErr = err
+      const msg = (err?.message || '').toLowerCase()
+      if (msg.includes('not found') || msg.includes('404') || msg.includes('not supported') || msg.includes('invalid model')) {
+        console.warn(`[GeminiService] Model ${model} unavailable (${err.message}), falling back to next candidate...`)
+        continue
+      }
+      throw err
+    }
+  }
+  throw lastErr || new Error('All candidate Gemini models failed')
+}
 
 export const GDVF_SYSTEM_INSTRUCTION = `
 You are the GLOBAL DIRECTOR OF VEHICLE FORENSICS & RECONDITIONING (GDVF).
@@ -322,8 +354,7 @@ export const geminiService = {
         .filter(Boolean)
         .join('\n')
 
-      const response = await ai.models.generateContent({
-        model: ANALYSIS_MODEL,
+      const response = await generateWithModelFallback({
         contents: { parts: [{ text: prompt }, ...assetParts] },
         config: {
           systemInstruction: GDVF_SYSTEM_INSTRUCTION,
@@ -353,25 +384,18 @@ export const geminiService = {
       },
       callbacks: {
         onopen: () => {
-          console.log('[AutoGuard Live] Connection established')
+          console.log('[Gemini Live] Connected (20Hz-20kHz Audio Streaming)')
           callbacks.onopen?.()
         },
         onmessage: (msg: any) => {
-          try {
-            callbacks.onmessage(msg)
-          } catch (err) {
-            console.error('[AutoGuard Live] Message handler error:', err)
-          }
+          callbacks.onmessage?.(msg)
         },
         onerror: (err: any) => {
-          console.error('[AutoGuard Live] Connection error:', err)
+          console.error('[Gemini Live] Connection error:', err)
           callbacks.onerror?.(err)
         },
         onclose: (evt: CloseEvent) => {
-          console.log('[AutoGuard Live] Closed. Code:', evt.code, 'Reason:', evt.reason)
-          if (evt.code !== 1000) {
-            console.warn('[AutoGuard Live] Abnormal closure — consider reconnecting')
-          }
+          console.log('[Gemini Live] Closed. Code:', evt.code)
           callbacks.onclose?.(evt)
         },
       },
@@ -383,29 +407,34 @@ export const geminiService = {
       ? `\nLIVE WEATHER RADAR: Location ${mission.currentWeather.locationName}, Condition ${mission.currentWeather.conditionText} (${mission.currentWeather.temperatureC}°C), Precipitation ${mission.currentWeather.precipitationMm} mm/h, Wind ${mission.currentWeather.windSpeedKmh} km/h (Gusts ${mission.currentWeather.windGustsKmh} km/h), Road Grip Index ${mission.currentWeather.roadGripIndex}%, Hazard Level ${mission.currentWeather.roadHazardLevel}. Safe Speed Cap: ${mission.currentWeather.safeSpeedCapKmh} km/h. Advisory: ${mission.currentWeather.tacticalAdvisory}`
       : ''
 
+    const missionContext = [
+      `DESTINATION: ${mission.destination}`,
+      `VEHICLE: ${mission.vehicleProfile}`,
+      `THREAT LEVEL: ${mission.threatLevel}`,
+      weatherContext,
+    ]
+      .filter(Boolean)
+      .join('\n')
+
     return ai.live.connect({
       model: LIVE_MODEL,
       config: {
         responseModalities: [Modality.AUDIO],
         systemInstruction: {
-          parts: [{
-            text:
-              GUARDIAN_SYSTEM_INSTRUCTION +
-              `\n\nMISSION: Destination ${mission.destination}. Vehicle: ${mission.vehicleProfile}. Threat: ${mission.threatLevel}.${weatherContext}`,
-          }],
+          parts: [
+            {
+              text: `${GUARDIAN_SYSTEM_INSTRUCTION}\n\nACTIVE MISSION CONTEXT:\n${missionContext}\n\nDeliver real-time tactical co-pilot voice advisories. Keep instructions under 15 words.`,
+            },
+          ],
         },
       },
       callbacks: {
         onopen: () => {
-          console.log('[Guardian Live] Connection established')
+          console.log('[Guardian Live] Connected to Tactical Copilot')
           callbacks.onopen?.()
         },
         onmessage: (msg: any) => {
-          try {
-            callbacks.onmessage(msg)
-          } catch (err) {
-            console.error('[Guardian Live] Message handler error:', err)
-          }
+          callbacks.onmessage?.(msg)
         },
         onerror: (err: any) => {
           console.error('[Guardian Live] Connection error:', err)
@@ -421,8 +450,7 @@ export const geminiService = {
 
   async generateText(prompt: string, systemInstruction?: string): Promise<string> {
     try {
-      const response = await ai.models.generateContent({
-        model: ANALYSIS_MODEL,
+      const response = await generateWithModelFallback({
         contents: prompt,
         config: {
           systemInstruction: systemInstruction || GDVF_SYSTEM_INSTRUCTION,
@@ -456,8 +484,7 @@ Return ONLY valid JSON:
   "class": "ECONOMY | LUXURY | EXOTIC | COMMERCIAL"
 }`
 
-      const response = await ai.models.generateContent({
-        model: ANALYSIS_MODEL,
+      const response = await generateWithModelFallback({
         contents: [
           {
             parts: [
