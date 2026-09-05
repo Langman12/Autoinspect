@@ -1,0 +1,23 @@
+---
+description: Superdesign Canvas workflow and AutoGuard AI design token guidelines
+globs: ["src/**/*", ".superdesign/**/*"]
+alwaysApply: true
+---
+
+# Superdesign Canvas Guidelines for AutoGuard AI
+
+## 1. Operating Rules
+- **Evidence-Only Visuals**: Ground all styling in `src/index.css` and `.superdesign/design-system.md`. Never invent fake markdown image links.
+- **Workflow State**: Check `.superdesign/resume.json` before redesigning. Use `drafts/` for iterations and provide `draft.html` + `preview.md`.
+- **Component Integrity**: Strict TypeScript, teardown of `AudioContext` and `MediaStream` in `useEffect`, and safe null chaining on AI payloads.
+
+## 2. Palette Tokens
+- **Backgrounds**: Slate 900/950 (`bg-slate-900`, `bg-slate-950`) with subtle cyan/emerald borders.
+- **Accents**: Cyan (`text-cyan-400`, `border-cyan-500`), Emerald (`text-emerald-400`), Amber/Red for diagnostic alerts.
+- **Typography**: Monospace data readouts (`font-mono`) for DSP frequencies and telemetry metrics.
+
+## 3. Verification
+- Verify all code changes with:
+  ```bash
+  node --experimental-strip-types scripts/run-all-tests.mjs
+  ```
