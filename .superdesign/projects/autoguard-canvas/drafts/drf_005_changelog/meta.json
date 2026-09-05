@@ -1,0 +1,10 @@
+{
+  "id": "drf_005_changelog",
+  "projectId": "autoguard-canvas",
+  "title": "Changelog HUD: Tactical Engineering Intelligence & Daily Deliverables Matrix",
+  "status": "active",
+  "mode": "branch",
+  "parent": "changelog_replica.html",
+  "createdAt": "2026-09-05T03:05:00Z",
+  "tags": ["changelog", "tactical-hud", "engineering-matrix", "telemetry", "superdesign"]
+}

@@ -1,6 +1,6 @@
 {
   "activeProject": "autoguard-canvas",
-  "lastUpdated": "2026-09-05T02:10:20Z",
+  "lastUpdated": "2026-09-05T03:06:00Z",
   "designSystemPath": ".superdesign/design-system.md",
   "projects": [
     {
@@ -10,9 +10,10 @@
         "drf_001_inspect",
         "drf_002_guardian",
         "drf_003_matrix",
-        "drf_004_testlab"
+        "drf_004_testlab",
+        "drf_005_changelog"
       ],
-      "activeDraft": "drf_001_inspect"
+      "activeDraft": "drf_005_changelog"
     }
   ],
   "workspaceRoot": "/home/def/autoinspect"
