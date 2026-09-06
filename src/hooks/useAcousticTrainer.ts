@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import {
   autoSeedTrainingDataset,
-  trainAcousticClassifier,
   type TrainedModelEvaluation,
   type LabeledAcousticSample,
 } from '../services/acousticTrainer.ts'
+import { acousticWorkerService } from '../services/acousticWorkerService.ts'
 
 export interface AcousticSynthOptions {
   id: string
@@ -95,7 +95,7 @@ export function useAcousticTrainer() {
     }, 300)
   }, [])
 
-  const trainModel = useCallback((testSplitRatio?: number | unknown) => {
+  const trainModel = useCallback(async (testSplitRatio?: number | unknown) => {
     const ratio = typeof testSplitRatio === 'number' ? testSplitRatio : 0.2
     let currentDs = acousticDataset
     if (currentDs.length === 0) {
@@ -108,12 +108,16 @@ export function useAcousticTrainer() {
 
     setTimeout(() => setTrainingProgress(60), 200)
     setTimeout(() => setTrainingProgress(90), 450)
-    setTimeout(() => {
-      const evaluation = trainAcousticClassifier(currentDs, ratio)
+
+    try {
+      const evaluation = await acousticWorkerService.trainModelAsync(currentDs, ratio)
       setTrainedModelEvaluation(evaluation)
       setTrainingProgress(100)
+    } catch (err) {
+      console.error('[useAcousticTrainer] Web Worker training failed:', err)
+    } finally {
       setIsTrainingModel(false)
-    }, 700)
+    }
   }, [acousticDataset])
 
   const clearDataset = useCallback(() => {

@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # AutoGuard AI Frontend Application
+  autoguard-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: autoguard-ai
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - autoguard-net
+
+  # Optional Self-Hosted Local Ollama AI Daemon Service
+  ollama-daemon:
+    image: ollama/ollama:latest
+    container_name: autoguard-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_ORIGINS=*
+    networks:
+      - autoguard-net
+    profiles:
+      - full-stack-offline
+
+networks:
+  autoguard-net:
+    driver: bridge
+
+volumes:
+  ollama-models:
+    driver: local

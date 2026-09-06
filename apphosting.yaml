@@ -1,0 +1,15 @@
+# ==============================================================================
+# AutoGuard AI — Google Firebase App Hosting Configuration
+# ==============================================================================
+runConfig:
+  minInstances: 1
+  maxInstances: 10
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 1024
+
+env:
+  - variable: NODE_ENV
+    value: production
+  - variable: VITE_OLLAMA_BASE_URL
+    value: "http://localhost:11434"
