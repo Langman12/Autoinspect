@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ollamaService } from '../services/ollamaService.ts'
 import { storageService } from '../services/storageService.ts'
 import { weatherService } from '../services/weatherService.ts'
@@ -8,12 +8,7 @@ import {
   type AcousticFaultProfile,
   type ResearchCitation,
 } from '../services/acousticKnowledgeBase.ts'
-import {
-  autoSeedTrainingDataset,
-  trainAcousticClassifier,
-  type TrainedModelEvaluation,
-  type LabeledAcousticSample,
-} from '../services/acousticTrainer.ts'
+import { useAcousticTrainer } from '../hooks/useAcousticTrainer.ts'
 import type { WeatherHazard, WeatherReport } from '../types.ts'
 
 interface HealthStatus {
@@ -129,12 +124,22 @@ export function TestLabView() {
   const [simVisibilityM, setSimVisibilityM] = useState<number>(10000)
   const [simReport, setSimReport] = useState<WeatherReport | null>(null)
 
-  // Audio Tone Generator States
-  const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false)
-  const [activeToneId, setActiveToneId] = useState<string | null>(null)
-  const audioCtxRef = useRef<AudioContext | null>(null)
-  const oscRef = useRef<OscillatorNode | null>(null)
-  const gainRef = useRef<GainNode | null>(null)
+  // Audio Tone Generator & Acoustic ML Training Hook
+  const {
+    acousticDataset,
+    setAcousticDataset,
+    trainedModelEvaluation,
+    setTrainedModelEvaluation,
+    isAutoSeeding,
+    isTrainingModel,
+    trainingProgress,
+    isPlayingAudio,
+    activeToneId,
+    playTone,
+    stopAudio: stopSyntheticAudio,
+    autoSeed: handleAutoSeed,
+    trainModel: handleTrainModel,
+  } = useAcousticTrainer()
 
   // OBD-II DTC State
   const [activeDTCs, setActiveDTCs] = useState<SimDTC[]>([PRESET_DTCS[0]])
@@ -146,15 +151,10 @@ export function TestLabView() {
   >([])
   const [isRunningTests, setIsRunningTests] = useState<boolean>(false)
 
-  // Acoustic Knowledge Base & ML Training State
+  // Acoustic Knowledge Base State
   const [kbSearchQuery, setKbSearchQuery] = useState<string>('')
   const [kbSubsystemFilter, setKbSubsystemFilter] = useState<string>('ALL')
   const [selectedFault, setSelectedFault] = useState<AcousticFaultProfile | null>(null)
-  const [acousticDataset, setAcousticDataset] = useState<LabeledAcousticSample[]>([])
-  const [trainedModelEvaluation, setTrainedModelEvaluation] = useState<TrainedModelEvaluation | null>(null)
-  const [isAutoSeeding, setIsAutoSeeding] = useState<boolean>(false)
-  const [isTrainingModel, setIsTrainingModel] = useState<boolean>(false)
-  const [trainingProgress, setTrainingProgress] = useState<number>(0)
   const [showBibliography, setShowBibliography] = useState<boolean>(false)
 
   // Run initial health probes
@@ -167,13 +167,6 @@ export function TestLabView() {
   useEffect(() => {
     recalculateSimulatedWeather()
   }, [simPrecipMm, simTempC, simWindKmh, simVisibilityM])
-
-  // Clean up audio on unmount
-  useEffect(() => {
-    return () => {
-      stopSyntheticAudio()
-    }
-  }, [])
 
   const runAllHealthChecks = async () => {
     // 1. Ollama Check
@@ -343,60 +336,15 @@ export function TestLabView() {
   }
 
   const playSyntheticAudio = (scenario: SyntheticAudioScenario) => {
-    stopSyntheticAudio()
-
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
-      if (!AudioCtx) return
-
-      const ctx = new AudioCtx()
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-
-      osc.type = scenario.waveType
-      osc.frequency.setValueAtTime(scenario.freqHz, ctx.currentTime)
-
-      // Add slight acoustic frequency modulation to mimic mechanical engine revs
-      const lfo = ctx.createOscillator()
-      const lfoGain = ctx.createGain()
-      lfo.frequency.setValueAtTime(12, ctx.currentTime) // 12Hz engine rotation
-      lfoGain.gain.setValueAtTime(scenario.freqHz * 0.05, ctx.currentTime)
-      lfo.connect(lfoGain)
-      lfoGain.connect(osc.frequency)
-      lfo.start()
-
-      gain.gain.setValueAtTime(0.15, ctx.currentTime) // Comfortable test volume
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-
-      osc.start()
-
-      audioCtxRef.current = ctx
-      oscRef.current = osc
-      gainRef.current = gain
-      setIsPlayingAudio(true)
-      setActiveToneId(scenario.id)
-    } catch (err) {
-      console.error('[TestLab] Failed to start audio synthesis:', err)
+    if (isPlayingAudio && activeToneId === scenario.id) {
+      stopSyntheticAudio()
+    } else {
+      playTone({
+        id: scenario.id,
+        freqHz: scenario.freqHz,
+        waveType: scenario.waveType,
+      })
     }
-  }
-
-  const stopSyntheticAudio = () => {
-    if (oscRef.current) {
-      try {
-        oscRef.current.stop()
-        oscRef.current.disconnect()
-      } catch {}
-      oscRef.current = null
-    }
-    if (audioCtxRef.current) {
-      try {
-        audioCtxRef.current.close()
-      } catch {}
-      audioCtxRef.current = null
-    }
-    setIsPlayingAudio(false)
-    setActiveToneId(null)
   }
 
   const addCustomDTC = () => {
@@ -486,49 +434,15 @@ export function TestLabView() {
     setIsRunningTests(false)
   }
 
-  const handleAutoSeed = () => {
-    setIsAutoSeeding(true)
-    setTimeout(() => {
-      const ds = autoSeedTrainingDataset(25)
-      setAcousticDataset(ds)
-      setIsAutoSeeding(false)
-    }, 300)
-  }
-
-  const handleTrainModel = () => {
-    let currentDs = acousticDataset
-    if (currentDs.length === 0) {
-      currentDs = autoSeedTrainingDataset(25)
-      setAcousticDataset(currentDs)
-    }
-
-    setIsTrainingModel(true)
-    setTrainingProgress(20)
-
-    setTimeout(() => setTrainingProgress(60), 200)
-    setTimeout(() => setTrainingProgress(90), 450)
-    setTimeout(() => {
-      const evaluation = trainAcousticClassifier(currentDs, 0.2)
-      setTrainedModelEvaluation(evaluation)
-      setTrainingProgress(100)
-      setIsTrainingModel(false)
-    }, 700)
-  }
-
   const playFaultTone = (fault: AcousticFaultProfile) => {
-    const sc: SyntheticAudioScenario = {
-      id: fault.id,
-      label: fault.faultName,
-      freqHz: fault.fundamentalFreqHz.typical,
-      waveType: fault.subsystem === 'ENGINE_CORE' ? 'sawtooth' : fault.subsystem === 'VALVETRAIN' ? 'square' : 'sine',
-      defectName: fault.faultName,
-      description: fault.symptomDescription,
-      color: 'border-cyan-500/50 bg-cyan-950/30 text-cyan-300',
-    }
     if (isPlayingAudio && activeToneId === fault.id) {
       stopSyntheticAudio()
     } else {
-      playSyntheticAudio(sc)
+      playTone({
+        id: fault.id,
+        freqHz: fault.fundamentalFreqHz.typical,
+        waveType: fault.subsystem === 'ENGINE_CORE' ? 'sawtooth' : fault.subsystem === 'VALVETRAIN' ? 'square' : 'sine',
+      })
     }
   }
 
@@ -969,14 +883,14 @@ export function TestLabView() {
 
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={handleAutoSeed}
+              onClick={() => handleAutoSeed()}
               disabled={isAutoSeeding}
               className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 text-xs font-bold font-mono transition-all flex items-center gap-1.5"
             >
               <span>⚡</span> {isAutoSeeding ? 'Seeding...' : `Auto-Seed Dataset (${acousticDataset.length || 300})`}
             </button>
             <button
-              onClick={handleTrainModel}
+              onClick={() => handleTrainModel()}
               disabled={isTrainingModel}
               className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black font-mono uppercase tracking-wider transition-all shadow-lg flex items-center gap-1.5"
             >
