@@ -3,7 +3,7 @@ import test from 'node:test'
 import fs from 'node:fs'
 import path from 'node:path'
 
-test('Deployment Configs — Dockerfile and Nginx configuration exist', () => {
+test('Deployment Configs — Dockerfile and Nginx configuration exist and contain security headers', () => {
   const dockerfilePath = path.resolve('Dockerfile')
   const nginxPath = path.resolve('nginx.conf')
 
@@ -13,6 +13,21 @@ test('Deployment Configs — Dockerfile and Nginx configuration exist', () => {
   const dockerfileContent = fs.readFileSync(dockerfilePath, 'utf-8')
   assert.ok(dockerfileContent.includes('node:22-alpine'))
   assert.ok(dockerfileContent.includes('nginx:alpine'))
+
+  const nginxContent = fs.readFileSync(nginxPath, 'utf-8')
+  assert.ok(nginxContent.includes('Content-Security-Policy'))
+  assert.ok(nginxContent.includes('Permissions-Policy'))
+  assert.ok(nginxContent.includes('worker-src'))
+})
+
+test('Deployment Configs — Docker Compose V2 file is valid', () => {
+  const composePath = path.resolve('docker-compose.yml')
+  assert.ok(fs.existsSync(composePath), 'docker-compose.yml must exist')
+
+  const composeContent = fs.readFileSync(composePath, 'utf-8')
+  assert.ok(composeContent.includes('autoguard-app'))
+  assert.ok(composeContent.includes('services:'))
+  assert.ok(!composeContent.startsWith("version: '3.8'"), 'Must not have obsolete version string')
 })
 
 test('Deployment Configs — Firebase Hosting JSON and App Hosting YAML exist and are valid', () => {
