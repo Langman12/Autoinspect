@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PdfExportModal } from './PdfExportModal.tsx'
 import type { InspectionReport } from '../types'
 
 function escapeHtml(str: string | number | boolean | null | undefined): string {
@@ -13,6 +14,7 @@ function escapeHtml(str: string | number | boolean | null | undefined): string {
 
 export function ReportView({ report, onBack }: { report: InspectionReport; onBack: () => void }) {
   const [viewMode, setViewMode] = useState<'forensic' | 'transparency'>('forensic')
+  const [showPdfModal, setShowPdfModal] = useState(false)
 
   const exportToPDF = () => {
     const isSafe = report.riskAssessment.finalDecision === 'SAFE TO DRIVE'
@@ -417,18 +419,24 @@ export function ReportView({ report, onBack }: { report: InspectionReport; onBac
       {/* Export Action Buttons */}
       <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-800">
         <button
-          onClick={exportToPDF}
-          className="flex items-center gap-2 px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-2xl font-black text-xs uppercase shadow-lg shadow-cyan-900/30"
+          onClick={() => setShowPdfModal(true)}
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-2xl font-black text-xs uppercase shadow-lg shadow-cyan-900/30 transition-transform active:scale-95"
         >
-          📄 Print & Export PDF Report
+          📜 Print & Export Forensic Certificate (SHA-256)
         </button>
         <button
           onClick={exportJSON}
-          className="flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-2xl font-black text-xs uppercase"
+          className="flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-2xl font-black text-xs uppercase transition-transform active:scale-95"
         >
           💾 Export Raw Forensic JSON
         </button>
       </div>
+
+      <PdfExportModal
+        report={report}
+        isOpen={showPdfModal}
+        onClose={() => setShowPdfModal(false)}
+      />
     </div>
   )
 }

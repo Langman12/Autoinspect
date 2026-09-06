@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { obdStreamer } from '../services/obdStreamer.ts'
+import { LiveGaugeCluster } from './LiveGaugeCluster.tsx'
 import type { DtcFaultCode, ObdConnectionStatus, ObdPidData } from '../types.ts'
 
 export function ObdStreamerView() {
@@ -8,6 +9,7 @@ export function ObdStreamerView() {
   const [dtcs, setDtcs] = useState<DtcFaultCode[]>(obdStreamer.getActiveDtcs())
   const [selectedDtc, setSelectedDtc] = useState<DtcFaultCode | null>(dtcs[0] || null)
   const [unit, setUnit] = useState<'METRIC' | 'IMPERIAL'>('METRIC')
+  const [displayMode, setDisplayMode] = useState<'ANALOG_CLUSTER' | 'PID_MATRIX'>('ANALOG_CLUSTER')
   const [historyRpm, setHistoryRpm] = useState<number[]>([])
 
   useEffect(() => {
@@ -81,6 +83,30 @@ export function ObdStreamerView() {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
+          {/* View Mode Toggle */}
+          <div className="flex bg-slate-950 border border-slate-800 rounded-xl p-0.5">
+            <button
+              onClick={() => setDisplayMode('ANALOG_CLUSTER')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-colors ${
+                displayMode === 'ANALOG_CLUSTER'
+                  ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🏎️ 60 FPS CLUSTER
+            </button>
+            <button
+              onClick={() => setDisplayMode('PID_MATRIX')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-colors ${
+                displayMode === 'PID_MATRIX'
+                  ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              📊 RAW PIDS
+            </button>
+          </div>
+
           <button
             onClick={() => setUnit(unit === 'METRIC' ? 'IMPERIAL' : 'METRIC')}
             className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300 hover:text-white"
@@ -121,6 +147,9 @@ export function ObdStreamerView() {
           )}
         </div>
       </div>
+
+      {/* 60 FPS Tactical Analog Gauge Cluster */}
+      {displayMode === 'ANALOG_CLUSTER' && <LiveGaugeCluster />}
 
       {/* Main Gauges Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
