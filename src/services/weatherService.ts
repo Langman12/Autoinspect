@@ -1,4 +1,10 @@
 import type { RoadHazardLevel, WeatherHazard, WeatherReport } from '../types'
+import {
+  resilientFetch,
+  weatherCircuitBreaker,
+  weatherRateLimiter,
+  weatherCache,
+} from './networkResilience.ts'
 
 /**
  * WMO Weather Interpretation Codes (WW) mapping
@@ -97,77 +103,124 @@ export const WEATHER_PRESETS: WeatherPreset[] = [
 
 export const weatherService = {
   /**
-   * Fetch real-time weather from Open-Meteo by coordinates
+   * Fetch real-time weather from Open-Meteo by coordinates with enterprise resilience & caching
    */
   async fetchWeatherByCoordinates(
     latitude: number,
     longitude: number,
     locationLabel?: string
   ): Promise<WeatherReport> {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(4)}&longitude=${longitude.toFixed(4)}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,weather_code,wind_speed_10m,wind_gusts_10m&hourly=visibility,precipitation_probability&forecast_days=1`
+    const latRounded = Number(latitude.toFixed(2))
+    const lonRounded = Number(longitude.toFixed(2))
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latRounded.toFixed(4)}&longitude=${lonRounded.toFixed(4)}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,weather_code,wind_speed_10m,wind_gusts_10m&hourly=visibility,precipitation_probability&forecast_days=1`
 
-    const response = await fetch(url, { signal: AbortSignal.timeout(6000) })
-    if (!response.ok) {
-      throw new Error(`Open-Meteo Weather API responded with status ${response.status}`)
-    }
+    try {
+      const data = await resilientFetch<any>(url, undefined, {
+        name: 'OpenMeteoWeather',
+        timeoutMs: 6000,
+        maxRetries: 2,
+        retryDelayMs: 400,
+        cacheTtlMs: 5 * 60 * 1000, // 5 minute TTL
+        cache: weatherCache,
+        circuitBreaker: weatherCircuitBreaker,
+        rateLimiter: weatherRateLimiter,
+        staleFallback: true,
+      })
 
-    const data = await response.json()
-    const current = data.current || {}
-    const hourly = data.hourly || {}
+      const current = data?.current || {}
+      const hourly = data?.hourly || {}
 
-    // Compute average immediate visibility from hourly data
-    const visibility = Array.isArray(hourly.visibility) && hourly.visibility.length > 0
-      ? Math.round(hourly.visibility[0])
-      : 10000
+      // Compute average immediate visibility from hourly data
+      const visibility = Array.isArray(hourly.visibility) && hourly.visibility.length > 0
+        ? Math.round(hourly.visibility[0])
+        : 10000
 
-    const precipProb = Array.isArray(hourly.precipitation_probability) && hourly.precipitation_probability.length > 0
-      ? Math.round(hourly.precipitation_probability[0])
-      : Math.min(100, Math.round((current.precipitation || 0) * 20))
+      const precipProb = Array.isArray(hourly.precipitation_probability) && hourly.precipitation_probability.length > 0
+        ? Math.round(hourly.precipitation_probability[0])
+        : Math.min(100, Math.round((current.precipitation || 0) * 20))
 
-    const weatherCode = Number(current.weather_code) || 0
-    const wmoInfo = WMO_CODE_MAP[weatherCode] || { text: 'Partly Cloudy', icon: '⛅', severityMultiplier: 0.1 }
+      const weatherCode = Number(current.weather_code) || 0
+      const wmoInfo = WMO_CODE_MAP[weatherCode] || { text: 'Partly Cloudy', icon: '⛅', severityMultiplier: 0.1 }
 
-    const temperatureC = Math.round((current.temperature_2m ?? 20) * 10) / 10
-    const apparentTemperatureC = Math.round((current.apparent_temperature ?? temperatureC) * 10) / 10
-    const precipitationMm = Math.round((current.precipitation ?? 0) * 10) / 10
-    const windSpeedKmh = Math.round((current.wind_speed_10m ?? 10) * 10) / 10
-    const windGustsKmh = Math.round((current.wind_gusts_10m ?? windSpeedKmh * 1.3) * 10) / 10
-    const relativeHumidity = Math.round(current.relative_humidity_2m ?? 50)
+      const temperatureC = Math.round((current.temperature_2m ?? 20) * 10) / 10
+      const apparentTemperatureC = Math.round((current.apparent_temperature ?? temperatureC) * 10) / 10
+      const precipitationMm = Math.round((current.precipitation ?? 0) * 10) / 10
+      const windSpeedKmh = Math.round((current.wind_speed_10m ?? 10) * 10) / 10
+      const windGustsKmh = Math.round((current.wind_gusts_10m ?? windSpeedKmh * 1.3) * 10) / 10
+      const relativeHumidity = Math.round(current.relative_humidity_2m ?? 50)
 
-    // Run automotive forensic hazard evaluation
-    const analysis = this.evaluateRoadHazards({
-      temperatureC,
-      apparentTemperatureC,
-      precipitationMm,
-      windSpeedKmh,
-      windGustsKmh,
-      visibilityMeters: visibility,
-      relativeHumidity,
-      weatherCode,
-      wmoMultiplier: wmoInfo.severityMultiplier,
-    })
+      // Run automotive forensic hazard evaluation
+      const analysis = this.evaluateRoadHazards({
+        temperatureC,
+        apparentTemperatureC,
+        precipitationMm,
+        windSpeedKmh,
+        windGustsKmh,
+        visibilityMeters: visibility,
+        relativeHumidity,
+        weatherCode,
+        wmoMultiplier: wmoInfo.severityMultiplier,
+      })
 
-    return {
-      locationName: locationLabel || `${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°`,
-      latitude,
-      longitude,
-      timestamp: Date.now(),
-      temperatureC,
-      apparentTemperatureC,
-      weatherCode,
-      conditionText: wmoInfo.text,
-      conditionIcon: wmoInfo.icon,
-      precipitationMm,
-      precipitationProbability: precipProb,
-      windSpeedKmh,
-      windGustsKmh,
-      visibilityMeters: visibility,
-      relativeHumidity,
-      roadHazardLevel: analysis.roadHazardLevel,
-      roadGripIndex: analysis.roadGripIndex,
-      hazards: analysis.hazards,
-      tacticalAdvisory: analysis.tacticalAdvisory,
-      safeSpeedCapKmh: analysis.safeSpeedCapKmh,
+      return {
+        locationName: locationLabel || `${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°`,
+        latitude,
+        longitude,
+        timestamp: Date.now(),
+        temperatureC,
+        apparentTemperatureC,
+        weatherCode,
+        conditionText: wmoInfo.text,
+        conditionIcon: wmoInfo.icon,
+        precipitationMm,
+        precipitationProbability: precipProb,
+        windSpeedKmh,
+        windGustsKmh,
+        visibilityMeters: visibility,
+        relativeHumidity,
+        roadHazardLevel: analysis.roadHazardLevel,
+        roadGripIndex: analysis.roadGripIndex,
+        hazards: analysis.hazards,
+        tacticalAdvisory: analysis.tacticalAdvisory,
+        safeSpeedCapKmh: analysis.safeSpeedCapKmh,
+      }
+    } catch (err) {
+      console.warn('[WeatherService] Upstream weather fetch failed, applying nominal baseline:', err)
+      // Provide safe nominal fallback if offline and no cache entry exists
+      const fallbackAnalysis = this.evaluateRoadHazards({
+        temperatureC: 20,
+        apparentTemperatureC: 20,
+        precipitationMm: 0,
+        windSpeedKmh: 10,
+        windGustsKmh: 15,
+        visibilityMeters: 10000,
+        relativeHumidity: 50,
+        weatherCode: 0,
+        wmoMultiplier: 0,
+      })
+
+      return {
+        locationName: locationLabel || `${latitude.toFixed(2)}°, ${longitude.toFixed(2)}° (Cached Baseline)`,
+        latitude,
+        longitude,
+        timestamp: Date.now(),
+        temperatureC: 20,
+        apparentTemperatureC: 20,
+        weatherCode: 0,
+        conditionText: 'Nominal Conditions (Offline)',
+        conditionIcon: '🌤️',
+        precipitationMm: 0,
+        precipitationProbability: 0,
+        windSpeedKmh: 10,
+        windGustsKmh: 15,
+        visibilityMeters: 10000,
+        relativeHumidity: 50,
+        roadHazardLevel: fallbackAnalysis.roadHazardLevel,
+        roadGripIndex: fallbackAnalysis.roadGripIndex,
+        hazards: fallbackAnalysis.hazards,
+        tacticalAdvisory: 'Standard baseline active. Connect to telemetry network for live radar updates.',
+        safeSpeedCapKmh: fallbackAnalysis.safeSpeedCapKmh,
+      }
     }
   },
 
@@ -190,14 +243,22 @@ export const weatherService = {
           term
         )}&count=5&language=en&format=json`
 
-        const geoRes = await fetch(geoUrl, { signal: AbortSignal.timeout(5000) })
-        if (geoRes.ok) {
-          const geoData = await geoRes.json()
-          if (Array.isArray(geoData.results) && geoData.results.length > 0) {
+        try {
+          const geoData = await resilientFetch<any>(geoUrl, undefined, {
+            name: 'OpenMeteoGeocoding',
+            timeoutMs: 5000,
+            maxRetries: 1,
+            cacheTtlMs: 24 * 60 * 60 * 1000, // 24 hour geocode cache
+            cache: weatherCache,
+            rateLimiter: weatherRateLimiter,
+            circuitBreaker: weatherCircuitBreaker,
+          })
+
+          if (Array.isArray(geoData?.results) && geoData.results.length > 0) {
             match = geoData.results[0]
             break
           }
-        }
+        } catch (_) {}
       }
 
       if (!match) {
