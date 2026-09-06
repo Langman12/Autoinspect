@@ -17,7 +17,16 @@ async function runTests() {
     // 1. Check Server Status & Version
     console.log('1️⃣ Checking Ollama Server Connectivity...');
     const startTime = Date.now();
-    const versionRes = await fetch(`${OLLAMA_BASE_URL}/api/version`);
+    let versionRes;
+    try {
+      versionRes = await fetch(`${OLLAMA_BASE_URL}/api/version`, {
+        signal: AbortSignal.timeout(3500),
+      });
+    } catch (netErr) {
+      console.log(`   ℹ️ Ollama is currently OFFLINE at ${OLLAMA_BASE_URL}`);
+      console.log('   To start local Ollama: run "ollama serve" in a separate terminal.');
+      return;
+    }
     if (!versionRes.ok) {
       throw new Error(`Ollama responded with status: ${versionRes.status}`);
     }

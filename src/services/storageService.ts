@@ -29,11 +29,25 @@ class StorageService {
           }
         }
 
+        request.onblocked = () => {
+          this.dbPromise = null
+          reject(new Error('AutoGuard IndexedDB upgrade blocked by open connections'))
+        }
+
         request.onsuccess = () => {
-          resolve(request.result)
+          const db = request.result
+          db.onversionchange = () => {
+            db.close()
+            this.dbPromise = null
+          }
+          db.onclose = () => {
+            this.dbPromise = null
+          }
+          resolve(db)
         }
 
         request.onerror = () => {
+          this.dbPromise = null
           reject(request.error || new Error('Failed to open AutoGuard IndexedDB'))
         }
       })

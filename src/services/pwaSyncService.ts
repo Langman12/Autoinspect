@@ -43,6 +43,12 @@ export class PwaSyncService {
     return this.queue.filter((q) => q.status === 'PENDING_UPLOAD').length
   }
 
+  private static readonly MAX_SYNCED_HISTORY = 50
+
+  public getQueue(): OfflineSyncItem[] {
+    return [...this.queue]
+  }
+
   public enqueueItem(type: OfflineSyncItem['type'], payload: any): OfflineSyncItem {
     const item: OfflineSyncItem = {
       id: `SYNC-${Date.now().toString(36).toUpperCase()}`,
@@ -52,6 +58,7 @@ export class PwaSyncService {
       status: 'PENDING_UPLOAD',
     }
     this.queue.push(item)
+    this.pruneQueue()
     this.notify()
 
     if (this.isOnline) {
@@ -62,14 +69,35 @@ export class PwaSyncService {
   }
 
   public async processQueue() {
-    for (const item of this.queue) {
-      if (item.status === 'PENDING_UPLOAD') {
-        // Simulate background network upload
-        await new Promise((r) => setTimeout(r, 400))
+    const pendingItems = this.queue.filter((q) => q.status === 'PENDING_UPLOAD')
+    if (pendingItems.length === 0) return
+
+    const delay = typeof process !== 'undefined' && process.env.NODE_ENV === 'test' ? 0 : 50
+    await Promise.all(
+      pendingItems.map(async (item) => {
+        if (delay > 0) {
+          await new Promise((r) => setTimeout(r, delay))
+        }
         item.status = 'SYNCED'
-      }
-    }
+      })
+    )
+
+    this.pruneQueue()
     this.notify()
+  }
+
+  public clearSynced(): void {
+    this.queue = this.queue.filter((q) => q.status === 'PENDING_UPLOAD')
+    this.notify()
+  }
+
+  private pruneQueue(): void {
+    const pending = this.queue.filter((q) => q.status === 'PENDING_UPLOAD')
+    const synced = this.queue.filter((q) => q.status === 'SYNCED')
+    if (synced.length > PwaSyncService.MAX_SYNCED_HISTORY) {
+      const retainedSynced = synced.slice(-PwaSyncService.MAX_SYNCED_HISTORY)
+      this.queue = [...pending, ...retainedSynced]
+    }
   }
 
   public subscribe(callback: (status: PwaSyncStatus, pendingCount: number) => void): () => void {

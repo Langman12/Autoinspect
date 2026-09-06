@@ -42,7 +42,7 @@ export function CameraView({
     text: string
     type: 'success' | 'info' | 'error'
   } | null>(null)
-  let reconnectCount = 0
+  const reconnectCountRef = useRef(0)
 
   const currentPhaseObj = INSPECTION_PHASES.find((p) => p.id === currentPhase) || INSPECTION_PHASES[0]
 
@@ -62,6 +62,7 @@ export function CameraView({
 
   const toggleLive = async () => {
     if (isLiveEnabled) {
+      reconnectCountRef.current = 0
       liveSessionRef.current?.close()
       liveSessionRef.current = null
       streamRef.current?.getTracks().forEach((t) => t.stop())
@@ -78,17 +79,20 @@ export function CameraView({
       if (videoRef.current) videoRef.current.srcObject = stream
       setIsLiveEnabled(true)
       const session = await geminiService.connectLive({
-        onopen: () => setGuidanceText('GDVF Live forensic session active. AI Auditor listening and scanning.'),
+        onopen: () => {
+          reconnectCountRef.current = 0
+          setGuidanceText('GDVF Live forensic session active. AI Auditor listening and scanning.')
+        },
         onmessage: (msg) => {
           const text = msg.serverContent?.modelTurn?.parts?.find((p: any) => p.text)?.text
           if (text) setGuidanceText(text)
         },
         onerror: (err) => setGuidanceText('Live error: ' + err.message),
         onclose: async (evt) => {
-          if (evt.code !== 1000 && reconnectCount < MAX_RECONNECT_ATTEMPTS) {
-            reconnectCount++
-            const delay = reconnectCount * 2000
-            setGuidanceText('Session interrupted. Auto-reconnecting... attempt ' + reconnectCount)
+          if (evt.code !== 1000 && reconnectCountRef.current < MAX_RECONNECT_ATTEMPTS) {
+            reconnectCountRef.current++
+            const delay = reconnectCountRef.current * 2000
+            setGuidanceText(`Session interrupted. Auto-reconnecting... attempt ${reconnectCountRef.current}`)
             await new Promise((r) => setTimeout(r, delay))
             await toggleLive()
           } else {

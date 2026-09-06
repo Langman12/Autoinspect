@@ -28,6 +28,11 @@ async function testWeather() {
         }
       }
 
+      if (!geoRes || !geoRes.ok) {
+        console.log(`   ⚠️ Geocoding request failed for ${city}`);
+        continue;
+      }
+
       const geoData = await geoRes.json();
       const match = geoData.results?.[0];
 
@@ -48,6 +53,11 @@ async function testWeather() {
           if (attempt === 2) throw e;
           await new Promise((r) => setTimeout(r, 400));
         }
+      }
+
+      if (!wRes || !wRes.ok) {
+        console.log(`   ⚠️ Weather forecast request failed for ${city}`);
+        continue;
       }
 
       const wData = await wRes.json();

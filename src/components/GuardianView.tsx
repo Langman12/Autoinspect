@@ -64,10 +64,34 @@ export function GuardianView() {
     }
   }
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      guardianSessionRef.current?.close?.()
+      guardianSessionRef.current = null
+      if (watchIdRef.current !== null && typeof navigator !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchIdRef.current)
+        watchIdRef.current = null
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {})
+        audioContextRef.current = null
+      }
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+      }
+    }
+  }, [])
+
   const playAudio = async (b64: string) => {
     try {
-      const ctx = audioContextRef.current || new AudioContext()
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
+      if (!AudioCtx) return
+      const ctx = audioContextRef.current || new AudioCtx()
       audioContextRef.current = ctx
+      if (ctx.state === 'suspended') {
+        await ctx.resume()
+      }
       const raw = atob(b64)
       const buf = new Uint8Array(raw.length)
       for (let i = 0; i < raw.length; i++) buf[i] = raw.charCodeAt(i)

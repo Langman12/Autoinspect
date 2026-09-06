@@ -14,6 +14,21 @@ test('PWA Sync Service — Queue and Offline Item Processing', async () => {
   assert.equal(pwaSyncService.getPendingCount(), 0)
 })
 
+test('PWA Sync Service — Queue Retention and Purging', async () => {
+  // Enqueue multiple items
+  for (let i = 0; i < 60; i++) {
+    pwaSyncService.enqueueItem('TELEMETRY_FRAME', { frameId: i })
+  }
+  await pwaSyncService.processQueue()
+
+  const queue = pwaSyncService.getQueue()
+  // Synced queue should be capped at max retention limit (50)
+  assert.ok(queue.length <= 50, `Queue length ${queue.length} should not exceed 50`)
+
+  pwaSyncService.clearSynced()
+  assert.equal(pwaSyncService.getQueue().length, 0)
+})
+
 test('Haptics Service — Vibration Trigger Execution', () => {
   assert.doesNotThrow(() => {
     hapticsService.triggerVinLock()

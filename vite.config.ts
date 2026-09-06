@@ -21,12 +21,21 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-charts': ['recharts'],
-          'vendor-ai': ['@google/genai'],
-          'vendor-firebase': ['firebase/app', 'firebase/firestore', 'firebase/storage'],
-          'vendor-icons': ['lucide-react', 'motion'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor-react'
+            }
+            if (id.includes('recharts')) {
+              return 'vendor-charts'
+            }
+            if (id.includes('@google/genai')) {
+              return 'vendor-ai'
+            }
+            if (id.includes('lucide-react') || id.includes('motion') || id.includes('framer-motion')) {
+              return 'vendor-icons'
+            }
+          }
         },
       },
     },
