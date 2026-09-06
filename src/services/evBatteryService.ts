@@ -96,6 +96,114 @@ export class EvBatteryService {
       degradationCurve,
     }
   }
+
+  /**
+   * Evaluates pack telemetry against enterprise OEM thresholds
+   */
+  public evaluateBatteryHealth(telemetry: EvBatteryTelemetry): {
+    status: 'NOMINAL' | 'DEGRADED_CELL_WARN' | 'CRITICAL_HV_ALERT'
+    cellDeltaVerdict: {
+      deltaMv: number
+      status: 'OPTIMAL' | 'ACCEPTABLE' | 'WARNING' | 'CRITICAL'
+    }
+    isolationVerdict: {
+      isolationMegaOhm: number
+      status: 'SAFE' | 'LEAK_WARNING' | 'CRITICAL_ISOLATION_FAULT'
+    }
+    thermalVerdict: {
+      packTempC: number
+      coolantDeltaC: number
+      hotspotModuleId: number | null
+      status: 'NORMAL' | 'ELEVATED' | 'OVERHEATING'
+    }
+    recommendedDtcs: string[]
+    advisoryText: string
+  } {
+    const recommendedDtcs: string[] = []
+    let status: 'NOMINAL' | 'DEGRADED_CELL_WARN' | 'CRITICAL_HV_ALERT' = 'NOMINAL'
+
+    // 1. Cell Delta Evaluation
+    let deltaStatus: 'OPTIMAL' | 'ACCEPTABLE' | 'WARNING' | 'CRITICAL' = 'OPTIMAL'
+    if (telemetry.cellVoltageDeltaMv > 60) {
+      deltaStatus = 'CRITICAL'
+      status = 'CRITICAL_HV_ALERT'
+      recommendedDtcs.push('P0A7F', 'P0A80')
+    } else if (telemetry.cellVoltageDeltaMv > 30) {
+      deltaStatus = 'WARNING'
+      status = 'DEGRADED_CELL_WARN'
+      recommendedDtcs.push('P0A7F')
+    } else if (telemetry.cellVoltageDeltaMv > 15) {
+      deltaStatus = 'ACCEPTABLE'
+    }
+
+    // 2. High Voltage Isolation Resistance Check (Minimum 500 Ω/V; 400V requires > 200 kΩ = 0.2 MΩ, OEM nominal > 100 MΩ)
+    let isoStatus: 'SAFE' | 'LEAK_WARNING' | 'CRITICAL_ISOLATION_FAULT' = 'SAFE'
+    if (telemetry.isolationResistanceMegaOhm < 50) {
+      isoStatus = 'CRITICAL_ISOLATION_FAULT'
+      status = 'CRITICAL_HV_ALERT'
+      recommendedDtcs.push('P0AA6')
+    } else if (telemetry.isolationResistanceMegaOhm < 150) {
+      isoStatus = 'LEAK_WARNING'
+      if (status !== 'CRITICAL_HV_ALERT') status = 'DEGRADED_CELL_WARN'
+    }
+
+    // 3. Thermal Gradient & Hotspot Detection
+    let maxModTemp = 0
+    let minModTemp = 100
+    let hotspotModuleId: number | null = null
+
+    telemetry.modules.forEach((mod) => {
+      if (mod.temperatureC > maxModTemp) {
+        maxModTemp = mod.temperatureC
+        hotspotModuleId = mod.moduleId
+      }
+      if (mod.temperatureC < minModTemp) {
+        minModTemp = mod.temperatureC
+      }
+    })
+
+    const tempDelta = maxModTemp - minModTemp
+    const coolantDelta = Math.round((telemetry.coolantOutletTempC - telemetry.coolantInletTempC) * 10) / 10
+    let thermalStatus: 'NORMAL' | 'ELEVATED' | 'OVERHEATING' = 'NORMAL'
+
+    if (telemetry.packTemperatureC > 52 || tempDelta > 10) {
+      thermalStatus = 'OVERHEATING'
+      status = 'CRITICAL_HV_ALERT'
+      recommendedDtcs.push('P0A93')
+    } else if (telemetry.packTemperatureC > 42 || tempDelta > 6) {
+      thermalStatus = 'ELEVATED'
+      if (status !== 'CRITICAL_HV_ALERT') status = 'DEGRADED_CELL_WARN'
+    }
+
+    // Compose diagnostic advisory
+    let advisoryText = 'All 96 lithium-ion cell groups balanced. HV isolation resistance within nominal OEM limits.'
+    if (status === 'CRITICAL_HV_ALERT') {
+      advisoryText = `CRITICAL BMS FAULT: Cell delta (${telemetry.cellVoltageDeltaMv} mV) or isolation (${telemetry.isolationResistanceMegaOhm} MΩ) breached safe operating boundaries. High-voltage interlock inspection mandated.`
+    } else if (status === 'DEGRADED_CELL_WARN') {
+      advisoryText = `BMS ADVISORY: Cell delta deviation (${telemetry.cellVoltageDeltaMv} mV). Active cell balancing and DC fast-charge derating advised.`
+    }
+
+    return {
+      status,
+      cellDeltaVerdict: {
+        deltaMv: telemetry.cellVoltageDeltaMv,
+        status: deltaStatus,
+      },
+      isolationVerdict: {
+        isolationMegaOhm: telemetry.isolationResistanceMegaOhm,
+        status: isoStatus,
+      },
+      thermalVerdict: {
+        packTempC: telemetry.packTemperatureC,
+        coolantDeltaC: coolantDelta,
+        hotspotModuleId,
+        status: thermalStatus,
+      },
+      recommendedDtcs,
+      advisoryText,
+    }
+  }
 }
 
 export const evBatteryService = new EvBatteryService()
+

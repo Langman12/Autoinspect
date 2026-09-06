@@ -208,8 +208,8 @@ export interface FreezeFrameData {
 }
 
 export interface DtcFaultCode {
-  code: string // e.g., 'P0300', 'P0171'
-  system: 'POWERTRAIN' | 'CHASSIS' | 'BODY' | 'NETWORK_CAN'
+  code: string // e.g., 'P0300', 'P0171', 'P0A7F'
+  system: 'POWERTRAIN' | 'CHASSIS' | 'BODY' | 'NETWORK_CAN' | 'HIGH_VOLTAGE_EV' | 'SAFETY_ADAS'
   severity: 'CRITICAL' | 'WARNING' | 'ADVISORY'
   description: string
   possibleCauses: string[]

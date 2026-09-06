@@ -29,3 +29,35 @@ test('EV Battery Service — Cell Anomaly Detection & Degradation Curve', () => 
   assert.ok(ptLast.mileageKm >= 150000)
   assert.ok(ptLast.projectedSohPercent < 100)
 })
+
+test('EV Battery Service — Diagnostic Health Verdict & Thermal Safety Evaluation', async (t) => {
+  await t.test('Evaluates nominal pack telemetry and flags cell delta advisory', () => {
+    const telemetry = evBatteryService.generateTelemetry()
+    const verdict = evBatteryService.evaluateBatteryHealth(telemetry)
+
+    assert.ok(['NOMINAL', 'DEGRADED_CELL_WARN'].includes(verdict.status))
+    assert.strictEqual(verdict.isolationVerdict.status, 'SAFE')
+    assert.strictEqual(verdict.thermalVerdict.status, 'NORMAL')
+    assert.ok(verdict.cellDeltaVerdict.deltaMv > 0)
+  })
+
+  await t.test('Trips CRITICAL_HV_ALERT on low isolation resistance (<50 MΩ)', () => {
+    const telemetry = evBatteryService.generateTelemetry()
+    telemetry.isolationResistanceMegaOhm = 24 // severe chassis leak
+
+    const verdict = evBatteryService.evaluateBatteryHealth(telemetry)
+    assert.strictEqual(verdict.status, 'CRITICAL_HV_ALERT')
+    assert.strictEqual(verdict.isolationVerdict.status, 'CRITICAL_ISOLATION_FAULT')
+    assert.ok(verdict.recommendedDtcs.includes('P0AA6'))
+  })
+
+  await t.test('Detects thermal runaway overheating and recommends cooling DTC', () => {
+    const telemetry = evBatteryService.generateTelemetry()
+    telemetry.packTemperatureC = 56.5
+
+    const verdict = evBatteryService.evaluateBatteryHealth(telemetry)
+    assert.strictEqual(verdict.status, 'CRITICAL_HV_ALERT')
+    assert.strictEqual(verdict.thermalVerdict.status, 'OVERHEATING')
+    assert.ok(verdict.recommendedDtcs.includes('P0A93'))
+  })
+})

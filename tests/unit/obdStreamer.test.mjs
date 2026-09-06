@@ -12,7 +12,7 @@ test('OBD Streamer — Baseline PIDs and Connection State', () => {
 
 test('OBD Streamer — DTC Database and Fault Codes', () => {
   const dtcs = KNOWN_DTC_DATABASE
-  assert.ok(dtcs.length >= 4, 'Should contain at least 4 known DTC definitions')
+  assert.ok(dtcs.length >= 10, 'Should contain expanded DTC definitions including EV codes')
 
   const p0300 = dtcs.find((d) => d.code === 'P0300')
   assert.ok(p0300, 'P0300 misfire code must exist')
@@ -23,12 +23,27 @@ test('OBD Streamer — DTC Database and Fault Codes', () => {
   const p0171 = dtcs.find((d) => d.code === 'P0171')
   assert.ok(p0171, 'P0171 lean code must exist')
   assert.equal(p0171?.system, 'POWERTRAIN')
+
+  // High Voltage EV & Isolation DTCs
+  const p0a7f = dtcs.find((d) => d.code === 'P0A7F')
+  assert.ok(p0a7f, 'P0A7F EV battery deterioration DTC must exist')
+  assert.equal(p0a7f?.system, 'HIGH_VOLTAGE_EV')
+  assert.equal(p0a7f?.severity, 'CRITICAL')
+
+  const p0aa6 = dtcs.find((d) => d.code === 'P0AA6')
+  assert.ok(p0aa6, 'P0AA6 isolation fault DTC must exist')
+  assert.equal(p0aa6?.system, 'HIGH_VOLTAGE_EV')
+
+  const u0110 = dtcs.find((d) => d.code === 'U0110')
+  assert.ok(u0110, 'U0110 inverter CAN offline DTC must exist')
+  assert.equal(u0110?.system, 'NETWORK_CAN')
 })
 
 test('OBD Streamer — Inject and Clear DTCs', () => {
-  obdStreamer.injectDtc('P0420')
+  obdStreamer.clearCodes()
+  obdStreamer.injectDtc('P0A7F')
   const activeAfterInject = obdStreamer.getActiveDtcs()
-  assert.ok(activeAfterInject.some((d) => d.code === 'P0420'), 'P0420 should be active after injection')
+  assert.ok(activeAfterInject.some((d) => d.code === 'P0A7F'), 'P0A7F EV code should be active after injection')
 
   const cleared = obdStreamer.clearCodes()
   assert.equal(cleared, true)
