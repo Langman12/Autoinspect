@@ -21,7 +21,6 @@ async function captureAllScreenshots() {
     'http://localhost:5173/',
   ])
 
-  // Wait for port 9333
   await new Promise((r) => setTimeout(r, 2000))
 
   try {
@@ -73,45 +72,76 @@ async function captureAllScreenshots() {
     await send('Page.navigate', { url: 'http://localhost:5173/' })
     await capturePage('ui_01_inspect_hub.png', 2000)
 
-    // 2. Live App: Guardian GPS View
+    // 2. Live App: 3D Twin View
+    console.log('Capturing Live App: 3D Twin View...')
+    await evaluate(`
+      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('3D Twin'));
+      if (tabs.length > 0) tabs[0].click();
+    `)
+    await capturePage('ui_02_3d_digital_twin.png', 2500)
+
+    // 3. Live App: Guardian GPS + Black Box
     console.log('Capturing Live App: Guardian GPS View...')
     await evaluate(`
       const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Guardian GPS'));
       if (tabs.length > 0) tabs[0].click();
     `)
-    await capturePage('ui_02_guardian_gps.png', 2000)
+    await capturePage('ui_03_guardian_gps_blackbox.png', 2000)
 
-    // 3. Live App: Fleet Analytics / Insights
-    console.log('Capturing Live App: Fleet Analytics View...')
+    // 4. Live App: OBD-II Telemetry
+    console.log('Capturing Live App: OBD-II Telemetry View...')
     await evaluate(`
-      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Fleet Analytics') || el.textContent.includes('Insights'));
+      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('OBD-II'));
       if (tabs.length > 0) tabs[0].click();
     `)
-    await capturePage('ui_03_fleet_analytics.png', 2000)
+    await capturePage('ui_04_obd2_can_telemetry.png', 2000)
 
-    // 4. Live App: Pathology Matrix View
+    // 5. Live App: Pathology Matrix View
     console.log('Capturing Live App: Pathology Matrix View...')
     await evaluate(`
-      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Pathology Matrix') || el.textContent.includes('Pathology'));
+      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Matrix'));
       if (tabs.length > 0) tabs[0].click();
     `)
-    await capturePage('ui_04_pathology_matrix.png', 2000)
+    await capturePage('ui_05_pathology_matrix.png', 2000)
 
-    // 5. Live App: Intel Hub View
-    console.log('Capturing Live App: Intel Hub View...')
+    // 6. Live App: Parts & Labor Matrix View
+    console.log('Capturing Live App: Parts & Labor Matrix View...')
     await evaluate(`
-      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Intel Hub') || el.textContent.includes('Hub'));
+      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Parts'));
       if (tabs.length > 0) tabs[0].click();
     `)
-    await capturePage('ui_05_intel_hub.png', 2000)
+    await capturePage('ui_06_parts_labor_matrix.png', 2000)
 
-    // 6. Live App: Test Lab View
+    // 7. Live App: Cryptographic Passport View
+    console.log('Capturing Live App: Vehicle Passport View...')
+    await evaluate(`
+      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Passport'));
+      if (tabs.length > 0) tabs[0].click();
+    `)
+    await capturePage('ui_07_vehicle_passport.png', 2000)
+
+    // 8. Live App: Tread & Thermal IR View
+    console.log('Capturing Live App: Tread & Thermal View...')
+    await evaluate(`
+      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Tread/IR'));
+      if (tabs.length > 0) tabs[0].click();
+    `)
+    await capturePage('ui_08_tread_laser_thermal.png', 2000)
+
+    // 9. Live App: Fleet Analytics View
+    console.log('Capturing Live App: Fleet Analytics View...')
+    await evaluate(`
+      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Fleet'));
+      if (tabs.length > 0) tabs[0].click();
+    `)
+    await capturePage('ui_09_fleet_analytics.png', 2000)
+
+    // 10. Live App: Test Lab View
     console.log('Capturing Live App: Test Lab View...')
     await evaluate(`
       const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Test Lab'));
       if (tabs.length > 0) tabs[0].click();
     `)
-    // Seed and train in test lab for live confusion matrix
     await evaluate(`
       const seedBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Auto-Seed') || b.textContent.includes('Seed'));
       if (seedBtn) seedBtn.click();
@@ -121,27 +151,7 @@ async function captureAllScreenshots() {
       const trainBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Train Classifier') || b.textContent.includes('Train'));
       if (trainBtn) trainBtn.click();
     `)
-    await capturePage('ui_06_test_lab.png', 2500)
-
-    // 7. Superdesign Canvas Draft 1: Inspect HUD
-    console.log('Capturing Superdesign Canvas: drf_001_inspect...')
-    await send('Page.navigate', { url: 'file:///home/def/autoinspect/.superdesign/projects/autoguard-canvas/drafts/drf_001_inspect/draft.html' })
-    await capturePage('ui_07_canvas_drf_001_inspect.png', 2000)
-
-    // 8. Superdesign Canvas Draft 2: Guardian GPS
-    console.log('Capturing Superdesign Canvas: drf_002_guardian...')
-    await send('Page.navigate', { url: 'file:///home/def/autoinspect/.superdesign/projects/autoguard-canvas/drafts/drf_002_guardian/draft.html' })
-    await capturePage('ui_08_canvas_drf_002_guardian.png', 2000)
-
-    // 9. Superdesign Canvas Draft 3: Pathology Matrix
-    console.log('Capturing Superdesign Canvas: drf_003_matrix...')
-    await send('Page.navigate', { url: 'file:///home/def/autoinspect/.superdesign/projects/autoguard-canvas/drafts/drf_003_matrix/draft.html' })
-    await capturePage('ui_09_canvas_drf_003_matrix.png', 2000)
-
-    // 10. Superdesign Canvas Draft 4: Test Lab
-    console.log('Capturing Superdesign Canvas: drf_004_testlab...')
-    await send('Page.navigate', { url: 'file:///home/def/autoinspect/.superdesign/projects/autoguard-canvas/drafts/drf_004_testlab/draft.html' })
-    await capturePage('ui_10_canvas_drf_004_testlab.png', 2000)
+    await capturePage('ui_10_test_lab.png', 2500)
 
     console.log('🎉 All 10 UI Screenshots captured successfully!')
   } catch (err) {

@@ -2,13 +2,19 @@ import { useEffect } from 'react'
 import { AgentWindow } from './components/AgentWindow'
 import { CameraView } from './components/CameraView'
 import { DiagnosticMatrix } from './components/DiagnosticMatrix'
+import { DigitalTwin3D } from './components/DigitalTwin3D.tsx'
 import { FleetInsights } from './components/FleetInsights'
 import { GuardianView } from './components/GuardianView'
 import { IntelligenceHub } from './components/IntelligenceHub'
 import { Layout } from './components/Layout'
+import { ObdStreamerView } from './components/ObdStreamerView.tsx'
+import { PartSourcingMatrix } from './components/PartSourcingMatrix.tsx'
 import { ReportView } from './components/ReportView'
 import { TestLabView } from './components/TestLabView'
+import { TreadLaserProfiler } from './components/TreadLaserProfiler.tsx'
+import { VehiclePassportView } from './components/VehiclePassportView.tsx'
 import { VehicleTimeline } from './components/VehicleTimeline'
+import { VoiceMechanicCopilot } from './components/VoiceMechanicCopilot.tsx'
 import { useAutoGuardStore } from './store/useAutoGuardStore'
 import type { InspectionReport, VehicleProfile } from './types'
 
@@ -82,10 +88,20 @@ export default function App() {
     <Layout view={activeView} setView={setActiveView}>
       {currentReport ? (
         <ReportView report={currentReport} onBack={() => setCurrentReport(null)} />
+      ) : activeView === 'digitaltwin' ? (
+        <DigitalTwin3D />
       ) : activeView === 'guardian' ? (
         <GuardianView />
+      ) : activeView === 'obd' ? (
+        <ObdStreamerView />
       ) : activeView === 'matrix' ? (
         <DiagnosticMatrix />
+      ) : activeView === 'parts' ? (
+        <PartSourcingMatrix />
+      ) : activeView === 'passport' ? (
+        <VehiclePassportView />
+      ) : activeView === 'tread' ? (
+        <TreadLaserProfiler />
       ) : activeView === 'hub' ? (
         <IntelligenceHub history={history} onOpenReport={setCurrentReport} />
       ) : activeView === 'insights' ? (
@@ -258,6 +274,8 @@ export default function App() {
         </div>
       )}
       <AgentWindow activeVehicle={vehicle} />
+      <VoiceMechanicCopilot onNavigate={(view) => setActiveView(view as any)} />
     </Layout>
   )
 }
+

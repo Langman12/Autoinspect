@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { geminiService } from '../services/geminiService'
 import { weatherService, WEATHER_PRESETS, type WeatherPreset } from '../services/weatherService'
 import type { GuardianMission, WeatherReport } from '../types'
+import { BlackBoxRecorder } from './BlackBoxRecorder.tsx'
 
 interface SimulatedHazard {
   id: string
@@ -699,6 +700,10 @@ export function GuardianView() {
         </div>
       </div>
 
+      {/* In-Flight Black Box Flight Recorder Section */}
+      <BlackBoxRecorder />
+
     </div>
   )
 }
+

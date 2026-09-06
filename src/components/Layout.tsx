@@ -2,7 +2,18 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { aiService, type AIProvider } from '../services/aiService'
 import { ollamaService } from '../services/ollamaService'
 
-export type View = 'inspect' | 'guardian' | 'insights' | 'hub' | 'matrix' | 'testlab'
+export type View =
+  | 'inspect'
+  | 'digitaltwin'
+  | 'guardian'
+  | 'obd'
+  | 'matrix'
+  | 'parts'
+  | 'passport'
+  | 'tread'
+  | 'insights'
+  | 'hub'
+  | 'testlab'
 
 export function Layout({
   view,
@@ -41,10 +52,14 @@ export function Layout({
 
   const tabs: { id: View; label: string; icon: string }[] = [
     { id: 'inspect', label: 'Inspect', icon: '🎥' },
+    { id: 'digitaltwin', label: '3D Twin', icon: '🌐' },
     { id: 'guardian', label: 'Guardian GPS', icon: '🛡️' },
-    { id: 'insights', label: 'Fleet Analytics', icon: '📊' },
-    { id: 'matrix', label: 'Pathology Matrix', icon: '🔬' },
-    { id: 'hub', label: 'Intel Hub', icon: '📡' },
+    { id: 'obd', label: 'OBD-II', icon: '🔌' },
+    { id: 'matrix', label: 'Matrix', icon: '🔬' },
+    { id: 'parts', label: 'Parts', icon: '💰' },
+    { id: 'passport', label: 'Passport', icon: '📜' },
+    { id: 'tread', label: 'Tread/IR', icon: '🛞' },
+    { id: 'insights', label: 'Fleet', icon: '📊' },
     { id: 'testlab', label: 'Test Lab', icon: '🧪' },
   ]
 
