@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type, Modality } from '@google/genai'
+import { validateInspectionReport } from './ai/schemaValidator.ts'
 import type {
   ForensicAsset,
   GuardianMission,
@@ -362,14 +363,13 @@ export const geminiService = {
           responseSchema: FORENSIC_RESPONSE_SCHEMA,
         },
       })
-      const parsed = safeParseJSON((response as any).text ?? '')
+      const rawText = (response as any).text ?? ''
+      const parsed = safeParseJSON(rawText)
       if (!parsed) return null
-      return {
+      return validateInspectionReport({
         ...parsed,
-        id: crypto.randomUUID(),
-        timestamp: Date.now(),
         vehicle,
-      } as InspectionReport
+      }, crypto.randomUUID())
     })
   },
 

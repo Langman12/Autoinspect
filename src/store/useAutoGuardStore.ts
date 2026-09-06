@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { View } from '../components/Layout.tsx'
 import { aiService, type AIProvider } from '../services/aiService.ts'
+import { hapticsService } from '../services/hapticsService.ts'
 import { storageService } from '../services/storageService.ts'
 import type { InspectionReport, VehicleProfile } from '../types.ts'
 
@@ -13,6 +14,15 @@ export const DEFAULT_VEHICLE: VehicleProfile = {
   class: 'ECONOMY',
 }
 
+export interface HudAlert {
+  id: string
+  title: string
+  message: string
+  severity: 'INFO' | 'WARNING' | 'CRITICAL' | 'SUCCESS'
+  timestamp: number
+  durationMs: number
+}
+
 export interface AutoGuardState {
   activeView: View
   vehicle: VehicleProfile
@@ -20,6 +30,7 @@ export interface AutoGuardState {
   currentReport: InspectionReport | null
   aiProvider: AIProvider
   isLoadingReports: boolean
+  alerts: HudAlert[]
 }
 
 type Listener = (state: AutoGuardState) => void
@@ -32,6 +43,7 @@ class AutoGuardStore {
     currentReport: null,
     aiProvider: aiService.getActiveProvider(),
     isLoadingReports: false,
+    alerts: [],
   }
 
   private listeners: Set<Listener> = new Set()
@@ -140,6 +152,52 @@ class AutoGuardStore {
       console.error('[AutoGuardStore] Failed to delete report:', err)
     }
   }
+
+  public dispatchAlert(alert: {
+    title: string
+    message: string
+    severity?: HudAlert['severity']
+    durationMs?: number
+  }) {
+    const id = `alert-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+    const severity = alert.severity || 'INFO'
+    const durationMs = alert.durationMs ?? (severity === 'CRITICAL' ? 7000 : 4500)
+
+    const newAlert: HudAlert = {
+      id,
+      title: alert.title,
+      message: alert.message,
+      severity,
+      timestamp: Date.now(),
+      durationMs,
+    }
+
+    // Trigger haptic feedback
+    if (severity === 'CRITICAL') {
+      hapticsService.triggerImpactWarning()
+    } else if (severity === 'WARNING') {
+      hapticsService.triggerDefectAlert()
+    } else {
+      hapticsService.triggerButtonTap()
+    }
+
+    this.setState((prev) => ({
+      alerts: [newAlert, ...prev.alerts].slice(0, 5),
+    }))
+
+    // Auto dismiss
+    setTimeout(() => {
+      this.dismissAlert(id)
+    }, durationMs)
+
+    return id
+  }
+
+  public dismissAlert(id: string) {
+    this.setState((prev) => ({
+      alerts: prev.alerts.filter((a) => a.id !== id),
+    }))
+  }
 }
 
 export const autoGuardStore = new AutoGuardStore()
@@ -158,6 +216,13 @@ export function useAutoGuardStore(): AutoGuardState & {
   loadReports: () => Promise<void>
   saveReport: (report: InspectionReport) => Promise<void>
   deleteReport: (id: string) => Promise<void>
+  dispatchAlert: (alert: {
+    title: string
+    message: string
+    severity?: HudAlert['severity']
+    durationMs?: number
+  }) => string
+  dismissAlert: (id: string) => void
 } {
   const [state, setState] = useState<AutoGuardState>(autoGuardStore.getState())
 
@@ -178,5 +243,7 @@ export function useAutoGuardStore(): AutoGuardState & {
     loadReports: autoGuardStore.loadReports.bind(autoGuardStore),
     saveReport: autoGuardStore.saveReport.bind(autoGuardStore),
     deleteReport: autoGuardStore.deleteReport.bind(autoGuardStore),
+    dispatchAlert: autoGuardStore.dispatchAlert.bind(autoGuardStore),
+    dismissAlert: autoGuardStore.dismissAlert.bind(autoGuardStore),
   }
 }

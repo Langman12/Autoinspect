@@ -4,6 +4,7 @@ import type {
   VehicleProfile,
 } from '../types.ts'
 import { GDVF_SYSTEM_INSTRUCTION } from './geminiService.ts'
+import { validateInspectionReport } from './ai/schemaValidator.ts'
 
 const DEFAULT_BASE_URL =
   typeof window !== 'undefined'
@@ -287,8 +288,8 @@ Return ONLY a valid JSON object matching this schema (no markdown wrap, no other
       // Graceful fallback to heuristic GDVF synthesis
     }
 
-    // Assemble robust report with fallbacks
-    const report: InspectionReport = {
+    // Assemble and validate report with GDVF enforcement
+    const rawReport = {
       id: crypto.randomUUID(),
       timestamp: Date.now(),
       vehicle,
@@ -345,7 +346,7 @@ Return ONLY a valid JSON object matching this schema (no markdown wrap, no other
       imageUrl: imageAssets[0]?.data,
     }
 
-    return report
+    return validateInspectionReport(rawReport)
   },
 
   async runQuickTest(customPrompt?: string): Promise<{ response: string; latencyMs: number; model: string }> {

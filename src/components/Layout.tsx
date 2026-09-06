@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { aiService, type AIProvider } from '../services/aiService'
 import { ollamaService } from '../services/ollamaService'
 import { pwaSyncService } from '../services/pwaSyncService.ts'
+import { HudAlertOverlay } from './HudAlertOverlay.tsx'
 import type { PwaSyncStatus } from '../types.ts'
 
 export type View =
@@ -204,6 +205,8 @@ export function Layout({
           </div>
         </div>
       </header>
+
+      <HudAlertOverlay />
 
       <main className="max-w-6xl w-full mx-auto p-4 md:p-6 flex-1">{children}</main>
 

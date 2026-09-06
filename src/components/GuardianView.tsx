@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { geminiService } from '../services/geminiService'
 import { weatherService, WEATHER_PRESETS, type WeatherPreset } from '../services/weatherService'
+import { useRoadPhysicsStream } from '../hooks/useRoadPhysicsStream.ts'
 import type { GuardianMission, WeatherReport } from '../types'
 import { BlackBoxRecorder } from './BlackBoxRecorder.tsx'
 
@@ -20,16 +21,24 @@ export function GuardianView() {
   const [threatLevel, setThreatLevel] = useState<GuardianMission['threatLevel']>('high')
   const [routePriority, setRoutePriority] = useState<GuardianMission['routePriority']>('fastest')
   const [weatherAvoidance, setWeatherAvoidance] = useState<boolean>(true)
-  const [position, setPosition] = useState<GeolocationPosition | null>(null)
+  // Road Physics & Weather Stream Hook
+  const {
+    position,
+    setPosition,
+    weatherReport,
+    setWeatherReport,
+    isWeatherLoading,
+    activePreset,
+    currentSpeedKmh,
+    setCurrentSpeedKmh,
+    speedLimitKmh,
+    loadWeatherForLocation: fetchWeatherForPreset,
+    startGpsTracking,
+    stopGpsTracking,
+  } = useRoadPhysicsStream({ initialPresetId: 'current', initialSpeedKmh: 74 })
+
   const [transcript, setTranscript] = useState<string[]>([])
   const [voiceCoPilotEnabled, setVoiceCoPilotEnabled] = useState(true)
-  const [currentSpeedKmh, setCurrentSpeedKmh] = useState<number>(74)
-  const [speedLimitKmh] = useState<number>(80)
-  const [activePreset, setActivePreset] = useState<string>('current')
-
-  // Live Weather Telemetry State
-  const [weatherReport, setWeatherReport] = useState<WeatherReport | null>(null)
-  const [isWeatherLoading, setIsWeatherLoading] = useState<boolean>(false)
 
   const [hazards, setHazards] = useState<SimulatedHazard[]>([
     { id: 'h1', type: 'POTHOLE', distanceMeters: 450, description: 'Severe pothole in right lane (15cm impact risk)', severity: 'WARNING', source: 'RADAR' },
@@ -72,54 +81,6 @@ export function GuardianView() {
     }
   }
 
-  // Load weather for a given preset or GPS
-  const loadWeatherForLocation = async (preset: WeatherPreset) => {
-    setActivePreset(preset.id)
-    setIsWeatherLoading(true)
-
-    try {
-      let report: WeatherReport | null = null
-
-      if (preset.id === 'current') {
-        if (navigator.geolocation) {
-          report = await new Promise<WeatherReport | null>((resolve) => {
-            navigator.geolocation.getCurrentPosition(
-              async (pos) => {
-                setPosition(pos)
-                const res = await weatherService.fetchWeatherByCoordinates(
-                  pos.coords.latitude,
-                  pos.coords.longitude,
-                  'Current GPS Position'
-                )
-                resolve(res)
-              },
-              async () => {
-                const res = await weatherService.fetchWeatherByCoordinates(51.5074, -0.1278, 'London (GPS Default)')
-                resolve(res)
-              },
-              { timeout: 4000 }
-            )
-          })
-        } else {
-          report = await weatherService.fetchWeatherByCoordinates(51.5074, -0.1278, 'London (GPS Default)')
-        }
-      } else if (preset.latitude && preset.longitude) {
-        report = await weatherService.fetchWeatherByCoordinates(preset.latitude, preset.longitude, preset.label)
-      } else if (preset.locationName) {
-        report = await weatherService.fetchWeatherByLocationName(preset.locationName)
-      }
-
-      if (report) {
-        setWeatherReport(report)
-        applyWeatherToRadar(report)
-      }
-    } catch (e) {
-      console.warn('Weather fetch error:', e)
-    } finally {
-      setIsWeatherLoading(false)
-    }
-  }
-
   const applyWeatherToRadar = (report: WeatherReport) => {
     if (report.hazards && report.hazards.length > 0) {
       const mapped: SimulatedHazard[] = report.hazards.map((h, i) => ({
@@ -141,9 +102,13 @@ export function GuardianView() {
     }
   }
 
-  useEffect(() => {
-    loadWeatherForLocation(WEATHER_PRESETS[0])
-  }, [])
+  // Load weather for a given preset
+  const loadWeatherForLocation = async (preset: WeatherPreset) => {
+    const report = await fetchWeatherForPreset(preset)
+    if (report) {
+      applyWeatherToRadar(report)
+    }
+  }
 
   const startLocationTracking = () => {
     if (!navigator.geolocation) return
