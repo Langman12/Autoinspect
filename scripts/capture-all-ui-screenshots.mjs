@@ -6,7 +6,7 @@ const ARTIFACTS_DIR = '/home/nicholaas/.gemini/antigravity-ide/brain/c1799d99-4d
 mkdirSync(ARTIFACTS_DIR, { recursive: true })
 
 async function captureAllScreenshots() {
-  console.log('🚀 Launching Google Chrome for UI Screenshots...')
+  console.log('🚀 Launching Google Chrome for Extended UI Screenshots...')
   mkdirSync('/tmp/ag_screenshot_dir', { recursive: true })
 
   const chromeProc = spawn('/usr/bin/google-chrome', [
@@ -78,9 +78,9 @@ async function captureAllScreenshots() {
       const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('3D Twin'));
       if (tabs.length > 0) tabs[0].click();
     `)
-    await capturePage('ui_02_3d_digital_twin.png', 2500)
+    await capturePage('ui_02_3d_digital_twin.png', 2000)
 
-    // 3. Live App: Guardian GPS + Black Box
+    // 3. Live App: Guardian GPS View
     console.log('Capturing Live App: Guardian GPS View...')
     await evaluate(`
       const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Guardian GPS'));
@@ -88,7 +88,7 @@ async function captureAllScreenshots() {
     `)
     await capturePage('ui_03_guardian_gps_blackbox.png', 2000)
 
-    // 4. Live App: OBD-II Telemetry
+    // 4. Live App: OBD-II Telemetry View
     console.log('Capturing Live App: OBD-II Telemetry View...')
     await evaluate(`
       const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('OBD-II'));
@@ -96,13 +96,13 @@ async function captureAllScreenshots() {
     `)
     await capturePage('ui_04_obd2_can_telemetry.png', 2000)
 
-    // 5. Live App: Pathology Matrix View
-    console.log('Capturing Live App: Pathology Matrix View...')
+    // 5. Live App: EV Battery Diagnostics View
+    console.log('Capturing Live App: EV Battery Diagnostics View...')
     await evaluate(`
-      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Matrix'));
+      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('EV Diags'));
       if (tabs.length > 0) tabs[0].click();
     `)
-    await capturePage('ui_05_pathology_matrix.png', 2000)
+    await capturePage('ui_05_ev_battery_diags.png', 2000)
 
     // 6. Live App: Parts & Labor Matrix View
     console.log('Capturing Live App: Parts & Labor Matrix View...')
@@ -112,31 +112,47 @@ async function captureAllScreenshots() {
     `)
     await capturePage('ui_06_parts_labor_matrix.png', 2000)
 
-    // 7. Live App: Cryptographic Passport View
+    // 7. Live App: AI Trade-In Valuation View
+    console.log('Capturing Live App: Trade-In Valuation View...')
+    await evaluate(`
+      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Valuation'));
+      if (tabs.length > 0) tabs[0].click();
+    `)
+    await capturePage('ui_07_tradein_valuation.png', 2000)
+
+    // 8. Live App: Vehicle Passport View
     console.log('Capturing Live App: Vehicle Passport View...')
     await evaluate(`
       const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Passport'));
       if (tabs.length > 0) tabs[0].click();
     `)
-    await capturePage('ui_07_vehicle_passport.png', 2000)
+    await capturePage('ui_08_vehicle_passport.png', 2000)
 
-    // 8. Live App: Tread & Thermal IR View
+    // 9. Live App: Tread & Thermal IR View
     console.log('Capturing Live App: Tread & Thermal View...')
     await evaluate(`
       const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Tread/IR'));
       if (tabs.length > 0) tabs[0].click();
     `)
-    await capturePage('ui_08_tread_laser_thermal.png', 2000)
+    await capturePage('ui_09_tread_laser_thermal.png', 2000)
 
-    // 9. Live App: Fleet Analytics View
+    // 10. Live App: AR Holographic Spatial Camera View
+    console.log('Capturing Live App: AR Holographic Spatial Camera View...')
+    await evaluate(`
+      const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('AR HUD'));
+      if (tabs.length > 0) tabs[0].click();
+    `)
+    await capturePage('ui_10_ar_spatial_overlay.png', 2000)
+
+    // 11. Live App: Fleet Analytics View
     console.log('Capturing Live App: Fleet Analytics View...')
     await evaluate(`
       const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Fleet'));
       if (tabs.length > 0) tabs[0].click();
     `)
-    await capturePage('ui_09_fleet_analytics.png', 2000)
+    await capturePage('ui_11_fleet_analytics.png', 2000)
 
-    // 10. Live App: Test Lab View
+    // 12. Live App: Test Lab View
     console.log('Capturing Live App: Test Lab View...')
     await evaluate(`
       const tabs = Array.from(document.querySelectorAll('button, span')).filter(el => el.textContent.includes('Test Lab'));
@@ -151,9 +167,9 @@ async function captureAllScreenshots() {
       const trainBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Train Classifier') || b.textContent.includes('Train'));
       if (trainBtn) trainBtn.click();
     `)
-    await capturePage('ui_10_test_lab.png', 2500)
+    await capturePage('ui_12_test_lab.png', 2500)
 
-    console.log('🎉 All 10 UI Screenshots captured successfully!')
+    console.log('🎉 All 12 Extended UI Screenshots captured successfully!')
   } catch (err) {
     console.error('Error during screenshot capture:', err)
   } finally {

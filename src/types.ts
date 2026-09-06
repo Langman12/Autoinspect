@@ -372,3 +372,118 @@ export interface ThermalSpotMeasurement {
   status: 'NORMAL' | 'ELEVATED' | 'CRITICAL_OVERHEAT'
 }
 
+// ---------------------------------------------------------------------------
+// EV High-Voltage Battery Telemetry Types
+// ---------------------------------------------------------------------------
+export interface EvCell {
+  cellId: number // 1 to 96
+  moduleId: number // 1 to 16
+  voltageMv: number // e.g. 3920 mV = 3.92V
+  temperatureC: number
+  internalResistanceMilliOhm: number
+  status: 'OPTIMAL' | 'CELL_DELTA_WARN' | 'CRITICAL_DEGRADED'
+}
+
+export interface EvModule {
+  moduleId: number
+  cells: EvCell[]
+  averageVoltageV: number
+  temperatureC: number
+}
+
+export interface BatteryDegradationPoint {
+  mileageKm: number
+  projectedSohPercent: number
+  estimatedRangeKm: number
+}
+
+export interface EvBatteryTelemetry {
+  packVoltageV: number // e.g. 396.4V or 792.8V
+  packCurrentAmps: number
+  stateOfChargePercent: number // SOC %
+  stateOfHealthPercent: number // SOH %
+  packTemperatureC: number
+  coolantInletTempC: number
+  coolantOutletTempC: number
+  maxCellVoltageMv: number
+  minCellVoltageMv: number
+  cellVoltageDeltaMv: number // Variance across pack (nominally <30mV)
+  isolationResistanceMegaOhm: number // Nominal >500 MΩ
+  dendriteRiskScore: number // 0-100%
+  fastChargeCycleCount: number
+  totalKwhCapacityNominal: number
+  totalKwhCapacityCurrent: number
+  modules: EvModule[]
+  degradationCurve: BatteryDegradationPoint[]
+}
+
+// ---------------------------------------------------------------------------
+// Instant AI Trade-In Valuation & Dealership Auction Types
+// ---------------------------------------------------------------------------
+export interface AuctionMarketSpread {
+  wholesaleMmrLow: number
+  wholesaleMmrAverage: number
+  wholesaleMmrHigh: number
+  cleanRetailMarket: number
+  privatePartyTarget: number
+  roughTradeInBase: number
+}
+
+export interface ReconRoiItem {
+  component: string
+  repairCost: number
+  valueBoostAtAuction: number
+  netProfitDelta: number
+  roiPercent: number
+  recommendedPriority: 'HIGH_ROI' | 'MODERATE' | 'SKIP_UNPROFITABLE'
+}
+
+export interface TradeInValuation {
+  vehicleVin: string
+  baseMarketSpread: AuctionMarketSpread
+  totalReconDeductions: number
+  adjustedWholesaleBid: number
+  recommendedAction: 'WHOLESALE_AUCTION' | 'RETAIL_RECONDITION' | 'QUICK_TRADE_AS_IS'
+  reconRoiBreakdown: ReconRoiItem[]
+  estimatedRetailProfit: number
+  generatedAt: number
+}
+
+// ---------------------------------------------------------------------------
+// PWA Offline Sync & Haptics Types
+// ---------------------------------------------------------------------------
+export interface OfflineSyncItem {
+  id: string
+  type: 'INSPECTION_REPORT' | 'OBD_SNAPSHOT' | 'MEDIA_PHOTO' | 'AUDIO_DSP'
+  timestamp: number
+  payload: any
+  status: 'PENDING_UPLOAD' | 'SYNCED' | 'ERROR'
+}
+
+export type PwaSyncStatus = 'ONLINE_SYNCED' | 'OFFLINE_CACHED' | 'SYNCING_BACKGROUND'
+
+// ---------------------------------------------------------------------------
+// WebXR / AR Holographic Spatial Camera Types
+// ---------------------------------------------------------------------------
+export interface ArSpatialMarker {
+  id: string
+  component: string
+  x: number // Normalized screen or spatial coordinate
+  y: number
+  zDistanceMeters: number
+  label: string
+  defectSeverity: StatusLight
+  repairCostEstimate: string
+  sensorCorrelated: string
+}
+
+export interface ArCameraTrackingState {
+  trackingMode: 'SPATIAL_GYRO' | 'WEBXR_ANCHOR' | 'STATIC_SIMULATION'
+  cameraActive: boolean
+  calibrated: boolean
+  yaw: number
+  pitch: number
+  roll: number
+}
+
+

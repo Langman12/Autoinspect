@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
 import { AgentWindow } from './components/AgentWindow'
+import { ArSpatialOverlayView } from './components/ArSpatialOverlayView.tsx'
 import { CameraView } from './components/CameraView'
 import { DiagnosticMatrix } from './components/DiagnosticMatrix'
 import { DigitalTwin3D } from './components/DigitalTwin3D.tsx'
+import { EvBatteryDiagnostics } from './components/EvBatteryDiagnostics.tsx'
 import { FleetInsights } from './components/FleetInsights'
 import { GuardianView } from './components/GuardianView'
 import { IntelligenceHub } from './components/IntelligenceHub'
@@ -11,12 +13,14 @@ import { ObdStreamerView } from './components/ObdStreamerView.tsx'
 import { PartSourcingMatrix } from './components/PartSourcingMatrix.tsx'
 import { ReportView } from './components/ReportView'
 import { TestLabView } from './components/TestLabView'
+import { TradeInValuationView } from './components/TradeInValuationView.tsx'
 import { TreadLaserProfiler } from './components/TreadLaserProfiler.tsx'
 import { VehiclePassportView } from './components/VehiclePassportView.tsx'
 import { VehicleTimeline } from './components/VehicleTimeline'
 import { VoiceMechanicCopilot } from './components/VoiceMechanicCopilot.tsx'
 import { useAutoGuardStore } from './store/useAutoGuardStore'
 import type { InspectionReport, VehicleProfile } from './types'
+
 
 const SAMPLE_VEHICLES: { label: string; profile: VehicleProfile }[] = [
   {
@@ -94,14 +98,20 @@ export default function App() {
         <GuardianView />
       ) : activeView === 'obd' ? (
         <ObdStreamerView />
+      ) : activeView === 'evbattery' ? (
+        <EvBatteryDiagnostics />
       ) : activeView === 'matrix' ? (
         <DiagnosticMatrix />
       ) : activeView === 'parts' ? (
         <PartSourcingMatrix />
+      ) : activeView === 'valuation' ? (
+        <TradeInValuationView />
       ) : activeView === 'passport' ? (
         <VehiclePassportView />
       ) : activeView === 'tread' ? (
         <TreadLaserProfiler />
+      ) : activeView === 'ar' ? (
+        <ArSpatialOverlayView />
       ) : activeView === 'hub' ? (
         <IntelligenceHub history={history} onOpenReport={setCurrentReport} />
       ) : activeView === 'insights' ? (
@@ -112,6 +122,7 @@ export default function App() {
       ) : activeView === 'testlab' ? (
         <TestLabView />
       ) : (
+
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Vehicle Profile Setup Card */}
           <section className="glass-card rounded-3xl border border-slate-800 p-5 md:p-6 space-y-4 shadow-2xl glass-glow-cyan">

@@ -1,16 +1,21 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { aiService, type AIProvider } from '../services/aiService'
 import { ollamaService } from '../services/ollamaService'
+import { pwaSyncService } from '../services/pwaSyncService.ts'
+import type { PwaSyncStatus } from '../types.ts'
 
 export type View =
   | 'inspect'
   | 'digitaltwin'
   | 'guardian'
   | 'obd'
+  | 'evbattery'
   | 'matrix'
   | 'parts'
+  | 'valuation'
   | 'passport'
   | 'tread'
+  | 'ar'
   | 'insights'
   | 'hub'
   | 'testlab'
@@ -27,9 +32,15 @@ export function Layout({
   const [provider, setProvider] = useState<AIProvider>(aiService.getActiveProvider())
   const [ollamaOnline, setOllamaOnline] = useState<boolean | null>(null)
   const [activeModel, setActiveModel] = useState<string>(ollamaService.getTextModel())
+  const [pwaStatus, setPwaStatus] = useState<PwaSyncStatus>(pwaSyncService.getStatus())
+  const [pendingSync, setPendingSync] = useState<number>(pwaSyncService.getPendingCount())
 
   useEffect(() => {
     const unsub = aiService.onProviderChange((p) => setProvider(p))
+    const unsubPwa = pwaSyncService.subscribe((status, pending) => {
+      setPwaStatus(status)
+      setPendingSync(pending)
+    })
     const checkStatus = () => {
       ollamaService.checkHealth().then((h) => {
         setOllamaOnline(h.isOnline)
@@ -40,6 +51,7 @@ export function Layout({
     const interval = setInterval(checkStatus, 15000)
     return () => {
       unsub()
+      unsubPwa()
       clearInterval(interval)
     }
   }, [])
@@ -55,13 +67,17 @@ export function Layout({
     { id: 'digitaltwin', label: '3D Twin', icon: '🌐' },
     { id: 'guardian', label: 'Guardian GPS', icon: '🛡️' },
     { id: 'obd', label: 'OBD-II', icon: '🔌' },
+    { id: 'evbattery', label: 'EV Diags', icon: '🔋' },
     { id: 'matrix', label: 'Matrix', icon: '🔬' },
     { id: 'parts', label: 'Parts', icon: '💰' },
+    { id: 'valuation', label: 'Valuation', icon: '💵' },
     { id: 'passport', label: 'Passport', icon: '📜' },
     { id: 'tread', label: 'Tread/IR', icon: '🛞' },
+    { id: 'ar', label: 'AR HUD', icon: '🕶️' },
     { id: 'insights', label: 'Fleet', icon: '📊' },
     { id: 'testlab', label: 'Test Lab', icon: '🧪' },
   ]
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-slate-950">
@@ -138,6 +154,36 @@ export function Layout({
                 </span>
               </span>
             </button>
+
+            {/* PWA Offline / Online Sync Indicator */}
+            <div
+              title={
+                pwaStatus === 'ONLINE_SYNCED'
+                  ? 'PWA Online · Real-Time Cloud Sync'
+                  : pwaStatus === 'OFFLINE_CACHED'
+                  ? 'PWA Offline · Local Caching Active'
+                  : `Syncing ${pendingSync} pending inspection(s)`
+              }
+              className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-mono font-bold ${
+                pwaStatus === 'ONLINE_SYNCED'
+                  ? 'bg-slate-900 border-slate-800 text-slate-300'
+                  : pwaStatus === 'OFFLINE_CACHED'
+                  ? 'bg-amber-950/40 border-amber-800/60 text-amber-300 animate-pulse'
+                  : 'bg-cyan-950/40 border-cyan-800/60 text-cyan-300'
+              }`}
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  pwaStatus === 'ONLINE_SYNCED'
+                    ? 'bg-emerald-400'
+                    : pwaStatus === 'OFFLINE_CACHED'
+                    ? 'bg-amber-400'
+                    : 'bg-cyan-400 animate-ping'
+                }`}
+              />
+              <span>{pwaStatus === 'ONLINE_SYNCED' ? 'PWA SYNCED' : 'PWA FIELD MODE'}</span>
+            </div>
+
 
             <nav className="flex gap-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl p-1 shadow-inner overflow-x-auto">
               {tabs.map((t) => (
