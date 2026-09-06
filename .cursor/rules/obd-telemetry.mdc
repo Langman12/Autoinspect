@@ -1,0 +1,22 @@
+---
+description: Hardware Telematics, OBD-II/CAN-Bus, EV High-Voltage Batteries, and Physics rules
+globs: src/**/obd*,src/**/Obd*,src/**/evBattery*,src/**/EvBattery*,src/**/blackBox*,src/**/BlackBox*,src/services/weatherService.ts
+---
+
+# AutoGuard AI — Hardware Telemetry & Physics Protocols
+
+## 1. Web Bluetooth & Web Serial OBD-II Streamer
+- **ELM327 Emulation:** Support standard AT commands (`AT Z`, `AT SP 0`, `AT H1`, `0100`, `010C` RPM, `010D` Speed, `0105` Coolant, `03` DTC Read).
+- **CAN-Bus Framing:** Parse 11-bit standard and 29-bit extended CAN identifier frames with PID decoding.
+- **Failover / Disconnect:** Emit non-blocking event buffers; automatically transition to mock telemetry generator when no physical hardware is paired.
+
+## 2. EV High-Voltage 96-Cell Pack Architecture
+- **Nominal Cell Voltage:** 3.70V baseline; threshold warnings at `< 3.10V` (under-voltage) and `> 4.25V` (over-voltage).
+- **Cell Delta Deviation:** Cell-to-cell delta $> 0.045\text{V}$ indicates pack degradation; $> 0.080\text{V}$ triggers an orange warning; $> 0.120\text{V}$ triggers a critical fault.
+- **Thermal Range:** Baseline $24^\circ\text{C} - 32^\circ\text{C}$; over-temperature flags at $> 45^\circ\text{C}$.
+
+## 3. Road Physics & Friction Algorithms (Open-Meteo)
+- **Baseline Dry Asphalt:** 95% grip index, 120 km/h recommended max speed.
+- **Hydroplaning:** If precipitation $> 4.0\text{ mm/h}$ or WMO weather codes $\in [65, 82, 95, 96, 99]$: Grip -= 38, Max Speed $\le 70\text{ km/h}$.
+- **Black Ice Hazard:** If temperature $\le 2.5^\circ\text{C}$ and (precip $> 0$ or humidity $> 80\%$ or freezing rain WMO $\in [56, 57, 66, 67, 71, 73, 75, 85, 86]$): Grip -= 50, Max Speed $\le 50\text{ km/h}$.
+- **Crosswinds:** If gusts $> 55\text{ km/h}$: Grip -= 15, Max Speed $\le 80\text{ km/h}$.

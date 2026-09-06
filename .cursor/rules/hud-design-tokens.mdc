@@ -1,0 +1,20 @@
+---
+description: Cybernetic HUD UI Tokens, Glassmorphism, Tailwind styling, and Haptics rules
+globs: src/components/**,src/App.tsx,src/index.css
+---
+
+# AutoGuard AI — Cybernetic Tactical HUD Guidelines
+
+## 1. Color Palette Tokens
+- **Backgrounds:** `bg-slate-950`, `bg-slate-900/90`, with `backdrop-blur-md` glassmorphism and subtle grid textures.
+- **Accents & Telemetry:** Cyan (`text-cyan-400`, `border-cyan-500/30`, `bg-cyan-950/40`), Emerald (`text-emerald-400`, `border-emerald-500/30`), Amber (`text-amber-400`, `border-amber-500/30`), Red Alert (`text-red-400`, `border-red-500/40`, `bg-red-950/30`).
+- **Scanlines & Corner Brackets:** Use tactical monospace fonts (`font-mono`) and cyber corner clips (`border-l-2 border-t-2 border-cyan-500`).
+
+## 2. Haptic & Motion Interactions
+- Trigger subtle vibration haptic cues via `hapticsService.lightPulse()` on tab switches and metric toggles.
+- Trigger double pulse (`hapticsService.warningPulse()`) on safety warnings and triple pulse (`hapticsService.errorAlarm()`) on DTC/critical faults.
+- Use `motion/react` or CSS animations for smooth transitions without layout shifts.
+
+## 3. Responsive & Touch Controls
+- Minimum touch target size: 44px $\times$ 44px for field tablet ergonomics.
+- Ensure all canvas elements handle `devicePixelRatio` and window resize listeners with proper cleanup.

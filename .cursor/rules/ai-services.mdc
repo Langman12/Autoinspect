@@ -1,0 +1,25 @@
+---
+description: Dual Hybrid AI Subsystems, Ollama Local Daemons, and Gemini Cloud API rules
+globs: src/services/ai/**,src/services/*Service.ts,src/services/geminiService.ts,src/services/ollamaService.ts
+---
+
+# AutoGuard AI — Dual Hybrid AI Architecture
+
+## 1. Dual Hybrid Execution Hierarchy
+1. **Cloud Primary:** Google Gemini 2.5 Pro / Flash via `@google/genai` (structured JSON outputs + Gemini Live WebSockets for real-time video/audio).
+2. **Local Fallback:** Local Ollama daemon running `llama3.2-vision` / `qwen2.5-coder` on `http://127.0.0.1:11434`.
+3. **Deterministic Heuristic Engine:** Rule-based fallback matrix if both AI engines are unavailable offline.
+
+## 2. Safety & Null Resilience
+- Never access nested JSON properties on LLM outputs without defensive fallback chaining or default empty objects.
+- Strip markdown fencing (````json ... ````) automatically before calling `JSON.parse()`.
+- If an unparseable or partial payload is returned, retry with structured schema prompt repair before falling back to local heuristic estimators.
+
+## 3. GDVF Safety Decision Matrix
+- `finalDecision` MUST evaluate to `TOW TRUCK ONLY` if any critical safety rule triggers:
+  1. Deployed airbag unreplaced or airbag SRS warning illuminated.
+  2. Empty brake fluid or pedal travel to floor.
+  3. Kinked/cracked structural frame rail or clamp marks.
+  4. Tire tread $\le 2/32"$ or sidewall blowout/bulge.
+  5. Active fuel, steering, or brake hydraulic fluid leak.
+  6. Severe wheel bearing acoustic failure.

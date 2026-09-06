@@ -1,0 +1,22 @@
+---
+description: Web Audio API DSP Acoustic Frequency Analysis and FFT rules
+globs: src/**/acoustic*,src/**/Acoustic*,src/services/acoustic*.ts
+---
+
+# AutoGuard AI — DSP Acoustic Diagnostic Rules
+
+## 1. Acoustic Diagnostic Spectrum Protocols (20Hz – 20kHz)
+- **20Hz – 200Hz:** Structural resonance, exhaust drone, bottom-end transmission rumble.
+- **200Hz – 800Hz:** Engine rod knock, piston slap, valve train noise (**CRITICAL severity** if knock detected at 600–800Hz idle).
+- **800Hz – 2kHz:** Brake squeal onset, serpentine belt slip, CV joint click.
+- **2kHz – 8kHz:** Wheel bearing whir, alternator diode whine.
+- **8kHz – 20kHz:** High-frequency bearing distress, brake glazing, turbocharger whistle.
+
+## 2. Audio Processing Standards
+- **Filtering:** High-pass Biquad filter with 20Hz cutoff to eliminate DC offset and sub-audible wind buffeting.
+- **FFT Size:** Minimum 2048 samples (yielding ~21.5Hz frequency bins at 44.1kHz sampling rate) with smoothing time constant `0.80 - 0.85`.
+- **Windowing:** Use Hann windowing prior to FFT computation to minimize spectral leakage.
+
+## 3. Lifecycle & Memory Management
+- All `AudioContext`, `MediaStreamTrack`, and `AnalyserNode` instances MUST be cleanly closed and disconnected in the cleanup return of `useEffect`.
+- Handle `AudioContext.state === 'suspended'` by calling `resume()` on user gesture interaction.
